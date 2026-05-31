@@ -105,15 +105,82 @@ service cloud.firestore {
     }
 
     // ──────────────────────────────────────────────
-    // chores·choreLog Rules는 Day 3 task 13에서 작성.
-    // 그 전까지는 명시적 거부.
+    // Cross-collection helpers (chores·choreLog용)
+    //   주의: get()은 비용 발생. 캐시되지 않음.
     // ──────────────────────────────────────────────
-    match /chores/{choreId} {
-      allow read, write: if false;
+    function groupData(groupId) {
+      return get(/databases/$(database)/documents/groups/$(groupId)).data;
     }
 
+    function isGroupMember(groupId) {
+      return isSignedIn() && request.auth.uid in groupData(groupId).memberUids;
+    }
+
+    function isGroupOwner(groupId) {
+      return isSignedIn() && request.auth.uid == groupData(groupId).ownerId;
+    }
+
+    function choreData(choreId) {
+      return get(/databases/$(database)/documents/chores/$(choreId)).data;
+    }
+
+    // ──────────────────────────────────────────────
+    // chores/{choreId}
+    //   - read: 해당 그룹 멤버
+    //   - create/update/delete: 그룹 멤버 (방장 한정 X — 멤버 누구나 편집)
+    //   - 핵심 검증: groupId 변경 금지(소속 이동 차단)
+    // ──────────────────────────────────────────────
+    match /chores/{choreId} {
+      allow read: if isGroupMember(resource.data.groupId);
+
+      allow create: if isSignedIn()
+                    && isGroupMember(request.resource.data.groupId)
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.mode in ['rotation', 'fixed']
+                    && request.resource.data.color is string
+                    && request.resource.data.rotationOrder is list
+                    && request.resource.data.fixedSchedule is list
+                    && request.resource.data.rules is list
+                    && request.resource.data.currentTurnIndex is int
+                    && request.resource.data.allowProxyComplete is bool;
+
+      allow update: if isGroupMember(resource.data.groupId)
+                    && request.resource.data.groupId == resource.data.groupId;
+
+      allow delete: if isGroupMember(resource.data.groupId);
+    }
+
+    // ──────────────────────────────────────────────
+    // choreLog/{logId}
+    //   - read: 해당 그룹 멤버
+    //   - create: 그룹 멤버 + completedByActual=본인 + active=true
+    //     · rotation: completedBy는 현재 차례 멤버(또는 allowProxyComplete=true면 참여 멤버 누구나)
+    //     · 본 Rules에서는 멤버십·active만 검증, 차례 검증은 클라이언트 책임(get 비용↓)
+    //   - update: 방장만 + 비활성화 분기(active true→false + deactivateReason 입력)만 허용
+    //   - delete: 금지 (보존)
+    // ──────────────────────────────────────────────
     match /choreLog/{logId} {
-      allow read, write: if false;
+      allow read: if isGroupMember(resource.data.groupId);
+
+      allow create: if isSignedIn()
+                    && isGroupMember(request.resource.data.groupId)
+                    && request.resource.data.completedByActual == request.auth.uid
+                    && request.resource.data.completedBy is string
+                    && request.resource.data.choreId is string
+                    && request.resource.data.type in ['rotation', 'random']
+                    && request.resource.data.active == true;
+
+      // 방장 비활성화: active만 true→false, deactivate 메타 필드 동시 입력
+      allow update: if isGroupOwner(resource.data.groupId)
+                    && resource.data.active == true
+                    && request.resource.data.active == false
+                    && request.resource.data.deactivateReason is string
+                    && request.resource.data.deactivateReason.size() > 0
+                    && request.resource.data.deactivatedBy == request.auth.uid
+                    && onlyChanged(['active', 'deactivateReason', 'deactivatedBy', 'deactivatedAt']);
+
+      allow delete: if false;
     }
   }
 }
