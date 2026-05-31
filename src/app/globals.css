@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-background: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-foreground: #1a2233;
+  --color-muted: #6b7785;
+  --color-border: #e1e5eb;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-brand: #1f3358;
+  --color-brand-foreground: #ffffff;
+
+  --color-chore-blue: #4a90d9;
+  --color-chore-red: #e74c3c;
+  --color-chore-green: #2ecc71;
+  --color-chore-orange: #f39c12;
+  --color-chore-purple: #9b59b6;
+  --color-chore-teal: #1abc9c;
+  --color-chore-pink: #e91e8c;
+  --color-chore-navy: #34495e;
+  --color-chore-gray: #95a5a6;
+  --color-chore-yellow: #f1c40f;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", system-ui, sans-serif;
 }
