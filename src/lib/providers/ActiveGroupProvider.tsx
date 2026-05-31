@@ -7,7 +7,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { arrayRemove, updateDoc } from "firebase/firestore";
 import { useGroups } from "@/lib/hooks/useGroups";
+import { useUserDoc } from "@/lib/hooks/useUserDoc";
+import { userRef } from "@/lib/firebase/collections";
 import type { GroupDoc } from "@/lib/types/firestore";
 
 const STORAGE_KEY = "smwu-active-group-id";
@@ -32,7 +35,22 @@ export const ActiveGroupContext = createContext<ActiveGroupContextValue>({
 
 export function ActiveGroupProvider({ children }: { children: ReactNode }) {
   const { groups, loading, error } = useGroups();
+  const { userDoc } = useUserDoc();
   const [activeGroupId, setActiveGroupIdState] = useState<string | null>(null);
+
+  // 강퇴 후 stale: users.groupIds에 본인이 이미 빠진 그룹 id가 남아 있을 수 있음.
+  // groups는 array-contains(uid)로 실제 멤버십 = 진실의 원천. 둘 비교 후 차이 제거.
+  useEffect(() => {
+    if (loading || !userDoc) return;
+    const actual = new Set(groups.map((g) => g.id));
+    const stales = userDoc.groupIds.filter((id) => !actual.has(id));
+    if (stales.length === 0) return;
+    updateDoc(userRef(userDoc.uid), {
+      groupIds: arrayRemove(...stales),
+    }).catch((e) => {
+      console.warn("[groupIds 자가 정리 실패]", e);
+    });
+  }, [loading, userDoc, groups]);
 
   // localStorage 초기값 1회 hydrate
   useEffect(() => {
