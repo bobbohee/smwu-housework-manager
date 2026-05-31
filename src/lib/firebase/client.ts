@@ -1,6 +1,10 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { connectAuthEmulator, getAuth, type Auth } from "firebase/auth";
+import {
+  connectFirestoreEmulator,
+  getFirestore,
+  type Firestore,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,9 +15,13 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+const USE_EMULATOR = process.env.NEXT_PUBLIC_USE_EMULATOR === "true";
+
 let app: FirebaseApp | null = null;
 let authInstance: Auth | null = null;
 let dbInstance: Firestore | null = null;
+let authEmuConnected = false;
+let dbEmuConnected = false;
 
 export function getFirebaseApp(): FirebaseApp {
   if (!app) {
@@ -25,6 +33,12 @@ export function getFirebaseApp(): FirebaseApp {
 export function getFirebaseAuth(): Auth {
   if (!authInstance) {
     authInstance = getAuth(getFirebaseApp());
+    if (USE_EMULATOR && !authEmuConnected) {
+      connectAuthEmulator(authInstance, "http://127.0.0.1:9099", {
+        disableWarnings: true,
+      });
+      authEmuConnected = true;
+    }
   }
   return authInstance;
 }
@@ -32,6 +46,10 @@ export function getFirebaseAuth(): Auth {
 export function getDb(): Firestore {
   if (!dbInstance) {
     dbInstance = getFirestore(getFirebaseApp());
+    if (USE_EMULATOR && !dbEmuConnected) {
+      connectFirestoreEmulator(dbInstance, "127.0.0.1", 8080);
+      dbEmuConnected = true;
+    }
   }
   return dbInstance;
 }
