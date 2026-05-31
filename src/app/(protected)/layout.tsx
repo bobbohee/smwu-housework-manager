@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { ActiveGroupProvider } from "@/lib/providers/ActiveGroupProvider";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -20,5 +21,5 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return <ActiveGroupProvider>{children}</ActiveGroupProvider>;
 }
