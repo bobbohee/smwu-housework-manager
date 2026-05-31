@@ -1,8 +1,10 @@
 import {
+  arrayRemove,
   arrayUnion,
   doc,
   getDoc,
   serverTimestamp,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 import { getDb } from "@/lib/firebase/client";
@@ -94,4 +96,55 @@ export async function joinGroup(
   await batch.commit();
 
   return groupId;
+}
+
+export async function updateGroupName(
+  groupId: string,
+  newName: string,
+): Promise<void> {
+  const trimmed = newName.trim();
+  if (!trimmed) throw new GroupError("그룹 이름을 입력해주세요.");
+  if (trimmed.length > 20) {
+    throw new GroupError("그룹 이름은 20자 이내로 입력해주세요.");
+  }
+  await updateDoc(groupRef(groupId), { name: trimmed });
+}
+
+export async function transferOwnership(
+  groupId: string,
+  newOwnerUid: string,
+): Promise<void> {
+  // Rules: 방장 update 분기는 ownerId가 memberUids에 있어야 통과.
+  // newOwnerUid가 memberUids에 존재한다는 사전 검증은 클라이언트가 확인 (UI에서 멤버 목록만 표시).
+  await updateDoc(groupRef(groupId), { ownerId: newOwnerUid });
+}
+
+export async function kickMember(
+  groupId: string,
+  memberUid: string,
+  ownerUid: string,
+): Promise<void> {
+  if (memberUid === ownerUid) {
+    throw new GroupError("방장은 강퇴할 수 없습니다.");
+  }
+  // Rules 방장 분기로 memberUids 변경 가능. 단 user 본인의 groupIds는 self만 수정 가능 →
+  // 강퇴된 사용자 doc의 groupIds는 자가 정리 hook(stale id 청소)이 처리.
+  await updateDoc(groupRef(groupId), {
+    memberUids: arrayRemove(memberUid),
+  });
+}
+
+export async function leaveGroup(
+  groupId: string,
+  uid: string,
+  isOwner: boolean,
+): Promise<void> {
+  if (isOwner) {
+    throw new GroupError("방장은 다른 멤버에게 위임 후 나갈 수 있습니다.");
+  }
+  const db = getDb();
+  const batch = writeBatch(db);
+  batch.update(groupRef(groupId), { memberUids: arrayRemove(uid) });
+  batch.update(userRef(uid), { groupIds: arrayRemove(groupId) });
+  await batch.commit();
 }
