@@ -1,0 +1,87 @@
+<h2>우리집 살림 매니저 — 확정 설계 요약</h2>
+<p class="subtitle">브레인스토밍에서 결정된 사항을 정리했습니다. 터미널에서 피드백 주세요.</p>
+
+<div class="section">
+  <h3>🏠 그룹 & 인증</h3>
+  <div style="background:#1e1e2e;border-radius:8px;padding:16px;margin-bottom:12px;">
+    <ul style="list-style:none;padding:0;margin:0;color:#cdd6f4;">
+      <li style="margin-bottom:8px;">• Firebase Auth: 이메일/비밀번호만 저장</li>
+      <li style="margin-bottom:8px;">• 이름은 그룹 가입 시 입력 (그룹별 다른 이름 가능)</li>
+      <li style="margin-bottom:8px;">• 다중 그룹 지원 — 홈 상단에서 그룹 전환</li>
+      <li style="margin-bottom:8px;">• 초대 코드: 제한 없이 언제든 사용 가능</li>
+      <li style="margin-bottom:8px;">• 그룹 생성자 = 방장 (강퇴 권한)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>📋 집안일 모드</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+      <h4 style="color:#89b4fa;margin-top:0;">순번제</h4>
+      <ul style="color:#cdd6f4;padding-left:20px;margin:0;">
+        <li>완료 버튼으로 처리</li>
+        <li>1번 완료 = 차례 1번 소진</li>
+        <li>바로 다음 사람으로 넘어감</li>
+        <li>choreLog에 기록됨</li>
+      </ul>
+    </div>
+    <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+      <h4 style="color:#a6e3a1;margin-top:0;">요일 고정제</h4>
+      <ul style="color:#cdd6f4;padding-left:20px;margin:0;">
+        <li>완료 버튼 없음</li>
+        <li>해당 요일에 알림만 표시</li>
+        <li>"오늘 쓰레기 배출: 보희"</li>
+        <li>기록 저장 안 함</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>💣 꽝뽑기 (랜덤 돌리기)</h3>
+  <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+    <ul style="list-style:none;padding:0;margin:0;color:#cdd6f4;">
+      <li style="margin-bottom:8px;">• 그룹 멤버 전원 표시 (체크박스로 참여/제외)</li>
+      <li style="margin-bottom:8px;">• 당첨 인원 수 조정 가능 (기본 1명)</li>
+      <li style="margin-bottom:8px;">• 폭탄 아이콘 + 당첨자 이름 표시</li>
+      <li style="margin-bottom:8px;">• 결과는 choreLog에 기록</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section">
+  <h3>📅 캘린더 & 통계</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+      <h4 style="color:#f9e2af;margin-top:0;">캘린더</h4>
+      <ul style="color:#cdd6f4;padding-left:20px;margin:0;">
+        <li>순번제 완료 기록만 표시</li>
+        <li>집안일별 색상 구분</li>
+        <li>"설거지: 보희" 형태</li>
+        <li>클릭 시 상세 팝업</li>
+      </ul>
+    </div>
+    <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+      <h4 style="color:#f38ba8;margin-top:0;">통계</h4>
+      <ul style="color:#cdd6f4;padding-left:20px;margin:0;">
+        <li>숫자 + 차트 둘 다</li>
+        <li>멤버별 완료 횟수</li>
+        <li>집안일별 완료 횟수</li>
+        <li>이번 달 기준</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>⚙️ 아키텍처</h3>
+  <div style="background:#1e1e2e;border-radius:8px;padding:16px;">
+    <ul style="list-style:none;padding:0;margin:0;color:#cdd6f4;">
+      <li style="margin-bottom:8px;">• 프론트엔드 중심 — Firestore 직접 읽기/쓰기</li>
+      <li style="margin-bottom:8px;">• API Route는 최소한만 (서버 검증 필요 시)</li>
+      <li style="margin-bottom:8px;">• Firestore Security Rules로 권한 제어</li>
+      <li style="margin-bottom:8px;">• 집안일 등록 시 팔레트에서 색상 선택</li>
+    </ul>
+  </div>
+</div>

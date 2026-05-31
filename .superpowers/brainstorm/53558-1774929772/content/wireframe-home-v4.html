@@ -1,0 +1,89 @@
+<h2>2. 홈 (대시보드) — v4</h2>
+<p class="subtitle">카드를 정사각형 형태로 2열 그리드 배치했습니다. 피드백 주세요.</p>
+
+<div class="mockup" style="max-width:400px;margin:0 auto;">
+  <div class="mockup-header">홈 (대시보드)</div>
+  <div class="mockup-body" style="padding:0;">
+
+    <!-- 상단: 그룹 전환 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #313244;">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <span style="font-size:18px;font-weight:700;color:#cdd6f4;">우리집</span>
+        <span style="color:#a6adc8;font-size:12px;">&#9660;</span>
+      </div>
+      <div style="color:#a6adc8;font-size:13px;">2026.03.31 (화)</div>
+    </div>
+
+    <!-- 고정제 알림 배너 -->
+    <div style="margin:16px 20px;padding:12px 16px;background:rgba(166,227,161,0.1);border:1px solid rgba(166,227,161,0.3);border-radius:8px;">
+      <div style="font-size:12px;color:#a6e3a1;font-weight:600;margin-bottom:4px;">오늘의 고정 집안일</div>
+      <div style="color:#cdd6f4;font-size:14px;">🗑️ 쓰레기 배출 — <strong>보희</strong></div>
+    </div>
+
+    <!-- 순번제 집안일 카드 그리드 -->
+    <div style="padding:0 20px 12px;">
+      <div class="label" style="margin-bottom:12px;">순번제 집안일</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+        <!-- 카드 1: 설거지 -->
+        <div style="background:rgba(137,180,250,0.12);border:1px solid rgba(137,180,250,0.25);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;text-align:center;gap:8px;">
+          <div style="font-size:28px;">🍽️</div>
+          <div style="font-size:15px;font-weight:700;color:#89b4fa;">설거지</div>
+          <div style="font-size:17px;font-weight:700;color:#cdd6f4;">보희</div>
+          <button style="padding:6px 20px;background:#89b4fa;color:#1e1e2e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;">완료</button>
+        </div>
+
+        <!-- 카드 2: 빨래 -->
+        <div style="background:rgba(243,139,168,0.12);border:1px solid rgba(243,139,168,0.25);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;text-align:center;gap:8px;">
+          <div style="font-size:28px;">👕</div>
+          <div style="font-size:15px;font-weight:700;color:#f38ba8;">빨래</div>
+          <div style="font-size:17px;font-weight:700;color:#cdd6f4;">언니</div>
+          <button style="padding:6px 20px;background:#f38ba8;color:#1e1e2e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;">완료</button>
+        </div>
+
+        <!-- 카드 3: 청소 -->
+        <div style="background:rgba(249,226,175,0.12);border:1px solid rgba(249,226,175,0.25);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;text-align:center;gap:8px;">
+          <div style="font-size:28px;">🧹</div>
+          <div style="font-size:15px;font-weight:700;color:#f9e2af;">청소</div>
+          <div style="font-size:17px;font-weight:700;color:#cdd6f4;">동생</div>
+          <button style="padding:6px 20px;background:#f9e2af;color:#1e1e2e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;">완료</button>
+        </div>
+
+        <!-- 카드 4: 밥 -->
+        <div style="background:rgba(203,166,247,0.12);border:1px solid rgba(203,166,247,0.25);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;text-align:center;gap:8px;">
+          <div style="font-size:28px;">🍚</div>
+          <div style="font-size:15px;font-weight:700;color:#cba6f7;">밥</div>
+          <div style="font-size:17px;font-weight:700;color:#cdd6f4;">보희</div>
+          <button style="padding:6px 20px;background:#cba6f7;color:#1e1e2e;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;">완료</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 하단 탭 네비게이션 -->
+    <div style="display:flex;justify-content:space-around;align-items:center;padding:12px 0;border-top:1px solid #313244;background:#181825;">
+      <div style="text-align:center;">
+        <div style="font-size:20px;">🏠</div>
+        <div style="font-size:10px;color:#89b4fa;font-weight:600;">홈</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:20px;">📅</div>
+        <div style="font-size:10px;color:#a6adc8;">캘린더</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:20px;">💣</div>
+        <div style="font-size:10px;color:#a6adc8;">꽝뽑기</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:20px;">📊</div>
+        <div style="font-size:10px;color:#a6adc8;">통계</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:20px;">⚙️</div>
+        <div style="font-size:10px;color:#a6adc8;">설정</div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<h2>6. 통계</h2>
+<p class="subtitle">멤버별/집안일별 완료 통계입니다. 피드백 주세요.</p>
+
+<div class="mockup" style="max-width:360px;margin:0 auto;">
+  <div class="mockup-header">통계</div>
+  <div class="mockup-body" style="padding:0;">
+
+    <!-- 상단: 월 선택 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #313244;">
+      <span style="color:#a6adc8;cursor:pointer;font-size:18px;">&#9664;</span>
+      <span style="font-size:16px;font-weight:700;color:#cdd6f4;">2026년 3월</span>
+      <span style="color:#a6adc8;cursor:pointer;font-size:18px;">&#9654;</span>
+    </div>
+
+    <div style="padding:16px;">
+
+      <!-- 멤버별 완료 횟수 -->
+      <div style="margin-bottom:24px;">
+        <div class="label" style="margin-bottom:12px;font-size:11px;">멤버별 완료 횟수</div>
+
+        <!-- 막대 차트 -->
+        <div style="display:flex;align-items:flex-end;justify-content:center;gap:24px;height:120px;margin-bottom:12px;padding:0 8px;">
+          <!-- 언니 -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span style="font-size:11px;color:#cdd6f4;font-weight:600;">12</span>
+            <div style="width:40px;height:80px;background:rgba(137,180,250,0.3);border:1px solid rgba(137,180,250,0.5);border-radius:6px 6px 0 0;"></div>
+            <span style="font-size:11px;color:#a6adc8;">언니</span>
+          </div>
+          <!-- 보희 -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span style="font-size:11px;color:#cdd6f4;font-weight:600;">15</span>
+            <div style="width:40px;height:100px;background:rgba(166,227,161,0.3);border:1px solid rgba(166,227,161,0.5);border-radius:6px 6px 0 0;"></div>
+            <span style="font-size:11px;color:#a6adc8;">보희</span>
+          </div>
+          <!-- 동생 -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span style="font-size:11px;color:#cdd6f4;font-weight:600;">10</span>
+            <div style="width:40px;height:67px;background:rgba(203,166,247,0.3);border:1px solid rgba(203,166,247,0.5);border-radius:6px 6px 0 0;"></div>
+            <span style="font-size:11px;color:#a6adc8;">동생</span>
+          </div>
+        </div>
+
+        <!-- 숫자 테이블 -->
+        <div style="background:#1e1e2e;border-radius:8px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;padding:8px 12px;border-bottom:1px solid #313244;">
+            <span style="font-size:12px;color:#a6adc8;font-weight:600;">멤버</span>
+            <span style="font-size:12px;color:#a6adc8;font-weight:600;text-align:right;">완료 횟수</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;padding:8px 12px;border-bottom:1px solid #313244;">
+            <span style="font-size:13px;color:#cdd6f4;">언니</span>
+            <span style="font-size:13px;color:#cdd6f4;text-align:right;font-weight:600;">12회</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;padding:8px 12px;border-bottom:1px solid #313244;">
+            <span style="font-size:13px;color:#cdd6f4;">보희</span>
+            <span style="font-size:13px;color:#cdd6f4;text-align:right;font-weight:600;">15회</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;padding:8px 12px;">
+            <span style="font-size:13px;color:#cdd6f4;">동생</span>
+            <span style="font-size:13px;color:#cdd6f4;text-align:right;font-weight:600;">10회</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 집안일별 완료 횟수 -->
+      <div>
+        <div class="label" style="margin-bottom:12px;font-size:11px;">집안일별 완료 횟수</div>
+
+        <!-- 가로 막대 차트 -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:#cdd6f4;width:50px;flex-shrink:0;">설거지</span>
+            <div style="flex:1;height:20px;background:#1e1e2e;border-radius:4px;overflow:hidden;">
+              <div style="width:85%;height:100%;background:rgba(137,180,250,0.4);border-radius:4px;"></div>
+            </div>
+            <span style="font-size:11px;color:#a6adc8;width:24px;text-align:right;">17</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:#cdd6f4;width:50px;flex-shrink:0;">빨래</span>
+            <div style="flex:1;height:20px;background:#1e1e2e;border-radius:4px;overflow:hidden;">
+              <div style="width:50%;height:100%;background:rgba(243,139,168,0.4);border-radius:4px;"></div>
+            </div>
+            <span style="font-size:11px;color:#a6adc8;width:24px;text-align:right;">10</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:#cdd6f4;width:50px;flex-shrink:0;">청소</span>
+            <div style="flex:1;height:20px;background:#1e1e2e;border-radius:4px;overflow:hidden;">
+              <div style="width:40%;height:100%;background:rgba(249,226,175,0.4);border-radius:4px;"></div>
+            </div>
+            <span style="font-size:11px;color:#a6adc8;width:24px;text-align:right;">8</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:#cdd6f4;width:50px;flex-shrink:0;">밥</span>
+            <div style="flex:1;height:20px;background:#1e1e2e;border-radius:4px;overflow:hidden;">
+              <div style="width:10%;height:100%;background:rgba(203,166,247,0.4);border-radius:4px;"></div>
+            </div>
+            <span style="font-size:11px;color:#a6adc8;width:24px;text-align:right;">2</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 하단 탭 -->
+    <div style="display:flex;justify-content:space-around;align-items:center;padding:10px 0;border-top:1px solid #313244;background:#181825;">
+      <div style="text-align:center;"><div style="font-size:18px;">🏠</div><div style="font-size:9px;color:#a6adc8;">홈</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;">📅</div><div style="font-size:9px;color:#a6adc8;">캘린더</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;">💣</div><div style="font-size:9px;color:#a6adc8;">꽝뽑기</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;">📊</div><div style="font-size:9px;color:#89b4fa;font-weight:600;">통계</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;">⚙️</div><div style="font-size:9px;color:#a6adc8;">설정</div></div>
+    </div>
+
+  </div>
+</div>
