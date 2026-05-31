@@ -4,68 +4,67 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useUserDoc } from "@/lib/hooks/useUserDoc";
+import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { signOut } from "@/lib/firebase/auth";
 import { mapAuthError } from "@/lib/firebase/errors";
+import { GroupBar } from "@/components/group/GroupBar";
 
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { userDoc, loading: userDocLoading, error: userDocError } = useUserDoc();
+  const { groups, activeGroup, loading, error } = useActiveGroup();
   const [signingOut, setSigningOut] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   async function onSignOut() {
-    setError(null);
+    setSignOutError(null);
     setSigningOut(true);
     try {
       await signOut();
       router.replace("/login");
     } catch (err) {
-      setError(mapAuthError(err));
+      setSignOutError(mapAuthError(err));
       setSigningOut(false);
     }
   }
 
   const displayName = user?.displayName ?? user?.email ?? "사용자";
-  const groupIds = userDoc?.groupIds ?? [];
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
-      <header className="mb-8 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted">환영합니다</p>
-          <h1 className="text-2xl font-bold text-foreground">
-            {displayName}님
-          </h1>
-        </div>
-        <button
-          onClick={onSignOut}
-          disabled={signingOut}
-          className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-foreground transition hover:bg-background disabled:opacity-50"
-        >
-          {signingOut ? "로그아웃 중…" : "로그아웃"}
-        </button>
-      </header>
+    <>
+      <GroupBar
+        right={
+          <button
+            onClick={onSignOut}
+            disabled={signingOut}
+            className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground hover:bg-background disabled:opacity-50"
+            title={`${displayName}님 로그아웃`}
+          >
+            {signingOut ? "…" : "로그아웃"}
+          </button>
+        }
+      />
 
-      {userDocError ? (
-        <p className="rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
-          {userDocError}
-        </p>
-      ) : userDocLoading ? (
-        <p className="text-sm text-muted">불러오는 중…</p>
-      ) : groupIds.length === 0 ? (
-        <EmptyGroupState />
-      ) : (
-        <HasGroupState groupCount={groupIds.length} />
-      )}
+      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
+        {error ? (
+          <p className="rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
+            {error}
+          </p>
+        ) : loading ? (
+          <p className="text-sm text-muted">불러오는 중…</p>
+        ) : groups.length === 0 ? (
+          <EmptyGroupState />
+        ) : (
+          <ActiveGroupHome groupName={activeGroup?.name ?? ""} />
+        )}
 
-      {error && (
-        <p className="mt-4 rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
-          {error}
-        </p>
-      )}
-    </main>
+        {signOutError && (
+          <p className="mt-4 rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
+            {signOutError}
+          </p>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -98,23 +97,16 @@ function EmptyGroupState() {
   );
 }
 
-function HasGroupState({ groupCount }: { groupCount: number }) {
+function ActiveGroupHome({ groupName }: { groupName: string }) {
   return (
     <section className="rounded-2xl bg-surface p-6 shadow-sm ring-1 ring-border">
-      <h2 className="text-lg font-semibold text-foreground">
-        🏠 소속 그룹 {groupCount}개
+      <h2 className="text-base font-semibold text-foreground">
+        🏠 {groupName} 홈
       </h2>
       <p className="mt-2 text-sm text-muted">
-        Day 6 이후 그룹 카드 그리드 + 그룹 전환 UI 차차 구현 예정.
+        Day 7 이후 집안일 카드 그리드 + 오늘의 고정 집안일 알림 + 완료 버튼이
+        여기에 표시됩니다.
       </p>
-      <div className="mt-4">
-        <Link
-          href="/groups/join"
-          className="text-sm font-medium text-brand hover:underline"
-        >
-          + 다른 그룹에도 합류하기
-        </Link>
-      </div>
     </section>
   );
 }
