@@ -9,12 +9,14 @@ import {
   choreConverter,
   choreLogConverter,
   groupConverter,
+  inviteCodeConverter,
   userConverter,
 } from "@/lib/firebase/converters";
 import type {
   ChoreDoc,
   ChoreLogDoc,
   GroupDoc,
+  InviteCodeDoc,
   UserDoc,
 } from "@/lib/types/firestore";
 
@@ -23,6 +25,7 @@ export const COLLECTIONS = {
   groups: "groups",
   chores: "chores",
   choreLog: "choreLog",
+  inviteCodes: "inviteCodes",
 } as const;
 
 export function usersCol(): CollectionReference<UserDoc> {
@@ -39,6 +42,18 @@ export function groupsCol(): CollectionReference<GroupDoc> {
 
 export function groupRef(groupId: string): DocumentReference<GroupDoc> {
   return doc(getDb(), COLLECTIONS.groups, groupId).withConverter(groupConverter);
+}
+
+export function inviteCodesCol(): CollectionReference<InviteCodeDoc> {
+  return collection(getDb(), COLLECTIONS.inviteCodes).withConverter(
+    inviteCodeConverter,
+  );
+}
+
+export function inviteCodeRef(code: string): DocumentReference<InviteCodeDoc> {
+  return doc(getDb(), COLLECTIONS.inviteCodes, code).withConverter(
+    inviteCodeConverter,
+  );
 }
 
 export function choresCol(): CollectionReference<ChoreDoc> {

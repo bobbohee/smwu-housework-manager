@@ -105,6 +105,28 @@ service cloud.firestore {
     }
 
     // ──────────────────────────────────────────────
+    // inviteCodes/{code}
+    //   - 비멤버가 그룹 합류 전 코드→groupId lookup용. groups read 권한 노출 회피.
+    //   - read: 인증된 누구나 (코드 자체가 비밀)
+    //   - create: 본인이 ownerId일 때만. groupId-ownerId 일관성은 클라이언트 batch가 보장
+    //   - update: 금지 (회전은 delete + create)
+    //   - delete: 등록 당시 owner (방장 위임 시 stale 가능, Day 7 정비)
+    // ──────────────────────────────────────────────
+    match /inviteCodes/{code} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+                    && request.resource.data.ownerId == request.auth.uid
+                    && request.resource.data.groupId is string
+                    && isValidInviteCode(code);
+
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+                    && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ──────────────────────────────────────────────
     // Cross-collection helpers (chores·choreLog용)
     //   주의: get()은 비용 발생. 캐시되지 않음.
     // ──────────────────────────────────────────────

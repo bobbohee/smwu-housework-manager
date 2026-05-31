@@ -17,6 +17,13 @@ export interface GroupDoc {
   createdAt: Timestamp;
 }
 
+export interface InviteCodeDoc {
+  code: string;
+  groupId: string;
+  ownerId: string;
+  createdAt: Timestamp;
+}
+
 export type ChoreMode = "rotation" | "fixed";
 
 export type FixedScheduleEntry =

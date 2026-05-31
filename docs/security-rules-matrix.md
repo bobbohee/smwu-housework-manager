@@ -31,6 +31,19 @@
 
 inviteCode 형식: `^[A-HJ-KM-NP-Z2-9]{6}$` (혼동문자 `0/O/1/I/L` 제외).
 
+## inviteCodes/{code}
+
+비멤버의 그룹 합류 lookup 전용. body: `{ groupId, ownerId, createdAt }`.
+
+| 작업 | owner | 인증 사용자 | 비인증 | 비고 |
+|------|:-----:|:-----------:|:------:|------|
+| read | ✅ | ✅ | ❌ | 코드 자체가 비밀 |
+| create | ✅\* | ❌ | ❌ | \*ownerId=본인 + 코드 형식 검증 |
+| update | ❌ | ❌ | ❌ | 회전은 delete + create |
+| delete | ✅ | ❌ | ❌ | |
+
+⚠️ `ownerId`는 doc 생성 시점 owner. 방장 위임 후엔 stale. Day 7 그룹 설정에서 회전 로직과 함께 정비.
+
 ## chores/{choreId}
 
 | 작업 | 멤버 | 비멤버 | 비고 |

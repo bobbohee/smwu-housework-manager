@@ -8,6 +8,7 @@ import type {
   ChoreDoc,
   ChoreLogDoc,
   GroupDoc,
+  InviteCodeDoc,
   UserDoc,
 } from "@/lib/types/firestore";
 
@@ -15,6 +16,7 @@ function stripId(model: object): DocumentData {
   const copy = { ...model } as Record<string, unknown>;
   delete copy.id;
   delete copy.uid;
+  delete copy.code;
   return copy as DocumentData;
 }
 
@@ -35,6 +37,16 @@ export const groupConverter: FirestoreDataConverter<GroupDoc> = {
   fromFirestore(snap: QueryDocumentSnapshot, options: SnapshotOptions): GroupDoc {
     const data = snap.data(options) as Omit<GroupDoc, "id">;
     return { ...data, id: snap.id };
+  },
+};
+
+export const inviteCodeConverter: FirestoreDataConverter<InviteCodeDoc> = {
+  toFirestore(model) {
+    return stripId(model);
+  },
+  fromFirestore(snap: QueryDocumentSnapshot, options: SnapshotOptions): InviteCodeDoc {
+    const data = snap.data(options) as Omit<InviteCodeDoc, "code">;
+    return { ...data, code: snap.id };
   },
 };
 

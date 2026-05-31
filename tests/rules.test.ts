@@ -346,6 +346,95 @@ describe("choreLog", () => {
   });
 });
 
+describe("inviteCodes", () => {
+  it("인증 사용자 read 성공 (코드 lookup)", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      });
+    });
+    await assertSucceeds(getDoc(doc(bobDb(), "inviteCodes", "ABCD23")));
+  });
+
+  it("미인증 사용자 read 거부", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      });
+    });
+    await assertFails(getDoc(doc(anonDb(), "inviteCodes", "ABCD23")));
+  });
+
+  it("본인 ownerId로 create 성공", async () => {
+    await assertSucceeds(
+      setDoc(doc(aliceDb(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      }),
+    );
+  });
+
+  it("ownerId 위조 create 거부", async () => {
+    await assertFails(
+      setDoc(doc(aliceDb(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "bob",
+        createdAt: new Date(),
+      }),
+    );
+  });
+
+  it("코드 형식 위반 create 거부", async () => {
+    await assertFails(
+      setDoc(doc(aliceDb(), "inviteCodes", "ABCD0L"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      }),
+    );
+  });
+
+  it("owner delete 성공", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      });
+    });
+    await assertSucceeds(deleteDoc(doc(aliceDb(), "inviteCodes", "ABCD23")));
+  });
+
+  it("타인 delete 거부", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      });
+    });
+    await assertFails(deleteDoc(doc(bobDb(), "inviteCodes", "ABCD23")));
+  });
+
+  it("update 영구 거부", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "inviteCodes", "ABCD23"), {
+        groupId: "g1",
+        ownerId: "alice",
+        createdAt: new Date(),
+      });
+    });
+    await assertFails(
+      updateDoc(doc(aliceDb(), "inviteCodes", "ABCD23"), { groupId: "g2" }),
+    );
+  });
+});
+
 describe("misc", () => {
   it("미인증 사용자 모든 접근 거부", async () => {
     await assertFails(getDoc(doc(anonDb(), "users", "alice")));
