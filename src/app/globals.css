@@ -36,3 +36,9 @@ body {
   font-family: var(--font-sans), "Apple SD Gothic Neo", "Pretendard",
     "Noto Sans KR", system-ui, sans-serif;
 }
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted/70 focus:border-brand focus:ring-2 focus:ring-brand/20;
+  }
+}
