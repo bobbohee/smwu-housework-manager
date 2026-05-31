@@ -11,7 +11,7 @@ import { mapAuthError } from "@/lib/firebase/errors";
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { userDoc, loading: userDocLoading } = useUserDoc();
+  const { userDoc, loading: userDocLoading, error: userDocError } = useUserDoc();
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +48,11 @@ export default function HomePage() {
         </button>
       </header>
 
-      {userDocLoading ? (
+      {userDocError ? (
+        <p className="rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
+          {userDocError}
+        </p>
+      ) : userDocLoading ? (
         <p className="text-sm text-muted">불러오는 중…</p>
       ) : groupIds.length === 0 ? (
         <EmptyGroupState />

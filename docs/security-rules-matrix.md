@@ -15,7 +15,7 @@
 |------|:----:|:-------:|:----:|------|
 | read | ✅ | ❌ | ❌ | 멤버 이름은 group doc 캐시로 노출 예정 |
 | create | ✅ | ❌ | ❌ | 회원가입 시 signUp 헬퍼가 작성 |
-| update | ✅ | ❌ | ❌ | uid 변경 금지 (`request.resource.data.uid == uid`) |
+| update | ✅ | ❌ | ❌ | doc id가 uid이므로 변경 불가 (자명) |
 | delete | ✅ | ❌ | ❌ | 본인 탈퇴용 |
 
 ## groups/{groupId}

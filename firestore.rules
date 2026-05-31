@@ -30,20 +30,19 @@ service cloud.firestore {
 
     // ──────────────────────────────────────────────
     // users/{uid}
-    //   - 본인만 r/w
+    //   - 본인만 r/w (doc id == uid이므로 별도 uid 필드 검증 불필요)
     //   - groupIds 양방향 동기화는 클라이언트가 batch write로 책임
+    //   - body에는 name/email/groupIds/createdAt 저장. uid는 converter가 doc.id에서 채움
     // ──────────────────────────────────────────────
     match /users/{uid} {
       allow read: if isSelf(uid);
 
       allow create: if isSelf(uid)
-                    && request.resource.data.uid == uid
                     && request.resource.data.email is string
                     && request.resource.data.name is string
                     && request.resource.data.groupIds is list;
 
-      allow update: if isSelf(uid)
-                    && request.resource.data.uid == uid;
+      allow update: if isSelf(uid);
 
       allow delete: if isSelf(uid);
     }
