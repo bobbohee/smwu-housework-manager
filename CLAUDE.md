@@ -4,29 +4,42 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 프로젝트 상태
 
-**설계 단계** — 아직 구현 코드가 없다. Git 저장소도 초기화되어 있지 않다.
-현재 존재하는 것은 설계 산출물뿐이다:
+**구현 진행 중** — 1주차(인프라·인증·그룹) 완료. 2주차부터 집안일·캘린더·통계 진행 예정.
 
-- `docs/superpowers/specs/2026-03-31-house-chore-manager-design.md` — **단일 진실 공급원(SSOT)**. 기능, 데이터 모델, 페이지 구성이 모두 여기 정의됨. 구현 전 반드시 읽을 것.
-- `docs/superpowers/wireframes/wireframe-interactive.html` — 확정된 인터랙티브 와이어프레임. 사이드바(PC) + 하단 탭(모바일) 네비게이션 구조.
-- `.superpowers/brainstorm/` — 브레인스토밍 과정의 와이어프레임 후보들(작업용, 참고만).
+설계 산출물:
+- `docs/superpowers/specs/2026-03-31-house-chore-manager-design.md` — **단일 진실 공급원(SSOT)**. 기능·데이터 모델·페이지 구성 정의.
+- `docs/superpowers/wireframes/wireframe-interactive.html` — 확정 와이어프레임.
+- `docs/security-rules-matrix.md` — Firestore Rules 권한 매트릭스.
+- `.superpowers/brainstorm/` — 브레인스토밍 산출물 (참고).
 
-구현을 시작하면 아래 "예정 기술 스택"에 맞춰 빌드/테스트 명령을 이 파일에 추가할 것.
+## 기술 스택 (확정)
 
-## 예정 기술 스택
+| 영역 | 기술 | 버전 |
+|------|------|------|
+| 프론트엔드 | Next.js (App Router) + React | 16.2.6 / 19.2.4 |
+| 스타일 | Tailwind CSS | 4 |
+| 인증 | Firebase Auth | 12.14 |
+| DB | Firebase Firestore | 12.14 |
+| 테스트 | Vitest + @firebase/rules-unit-testing | 4 / 5 |
+| 에뮬레이터 | firebase-tools | 13.35 (Java 11 호환 유지) |
 
-| 영역 | 기술 |
-|------|------|
-| 프론트엔드 | React + Next.js (App Router) |
-| 백엔드 | Next.js API Routes — 서버 검증이 꼭 필요한 경우에만 |
-| 인증 | Firebase Auth (이메일/비밀번호) |
-| DB | Firebase Firestore |
+**아키텍처**: 프론트엔드 중심. 클라이언트가 Firestore SDK로 직접 r/w, 권한은 Security Rules로 제어. API Route 없음.
 
-**아키텍처 원칙**: 프론트엔드 중심. 클라이언트가 Firestore SDK로 직접 읽기/쓰기하고, 접근 권한은 Firestore Security Rules로 제어한다. API Route는 최소화.
+## 빌드·테스트 명령
 
-## 데이터 모델 (Firestore 4개 컬렉션)
+```bash
+npm run dev              # Turbopack dev server (http://localhost:3000)
+npm run build            # 프로덕션 빌드
+npm run lint             # ESLint
+npm run test:rules       # Firestore Rules + 단위 테스트 (emulator 자동 기동)
+npm run emulators        # auth + firestore 에뮬레이터 수동 기동
+```
 
-`users`, `groups`, `chores`, `choreLog`. 전체 스키마는 스펙 문서 "데이터 구조" 절 참조. 여러 화면에 걸쳐 적용되는 핵심 관계와 불변식:
+환경변수: `.env.local.example` → `.env.local` 복사 후 Firebase Console 키 6개 입력.
+
+## 데이터 모델 (Firestore 5개 컬렉션)
+
+`users`, `groups`, `chores`, `choreLog`, **`inviteCodes`**. 마지막은 구현 단계에서 추가된 lookup 전용 컬렉션 (`{code: groupId}` 매핑, 비멤버 합류 진입점). 전체 스키마는 스펙 문서 "데이터 구조" 절 + `docs/security-rules-matrix.md` 참조. 여러 화면에 걸쳐 적용되는 핵심 관계와 불변식:
 
 - **다대다 그룹 멤버십**: `users.groupIds[]` ↔ `groups.memberUids[]` 를 양방향으로 동기화해야 한다. 한 계정이 여러 그룹 소속 가능. 홈 상단에서 그룹 전환.
 - **순번제(rotation) chore**: `rotationOrder[]`(참여 멤버 + 순서) + `currentTurnIndex`로 현재 차례를 관리. 참여 멤버를 chore별로 다르게 설정 가능(전체 그룹 멤버 ≠ 참여 멤버). `allowProxyComplete`(기본 false)로 대신 완료 허용 여부 제어.
@@ -49,3 +62,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 7개 페이지: 로그인·회원가입 / 홈(대시보드) / 캘린더 / 집안일 관리 / 꽝뽑기 / 통계 / 그룹 설정.
 하단 탭(모바일) 또는 사이드바(PC)에서 홈·캘린더·꽝뽑기·통계·설정에 직접 접근 — 모든 기능 2~3클릭 내 도달이 설계 목표.
+
+라우트 그룹 구조:
+- `src/app/(public)/` — 로그인·회원가입 (인증 시 / 리다이렉트)
+- `src/app/(protected)/` — 인증 가드 + ActiveGroupProvider 마운트
+- `src/app/(protected)/(shell)/` — AppShell(사이드바+하단탭) 적용 페이지 묶음
+- `src/app/(protected)/groups/new·join/` — shell 밖, 첫 진입 카드 그대로
+
+## 핵심 코드 구조
+
+| 경로 | 역할 |
+|------|------|
+| `src/lib/firebase/client.ts` | SDK init + emulator 토글 |
+| `src/lib/firebase/auth.ts` | signUp/signIn/signOut 래퍼 + users doc 생성 |
+| `src/lib/firebase/converters.ts` | 5개 컬렉션 FirestoreDataConverter |
+| `src/lib/firebase/collections.ts` | 타입 안전 ref helper |
+| `src/lib/firebase/errors.ts` | Auth 에러 코드 한국어 매핑 |
+| `src/lib/group/invite-code.ts` | 6자 코드 생성·검증 (혼동문자 제외) |
+| `src/lib/group/operations.ts` | createGroup/joinGroup/updateName/transfer/kick/leave |
+| `src/lib/providers/AuthProvider.tsx` | onAuthStateChanged 구독 |
+| `src/lib/providers/ActiveGroupProvider.tsx` | 활성 그룹 + stale 자가 정리 |
+| `src/lib/hooks/useAuth·useUserDoc·useGroups·useActiveGroup` | 상태 hook |
+| `src/components/nav/*` | Sidebar·BottomTabs·AppShell·PlaceholderPage |
+| `src/components/group/GroupBar·GroupSwitcher` | 그룹 전환 UI |
+
+## 클라이언트 책임 (Rules가 안 막는 검증)
+
+`docs/security-rules-matrix.md` 끝에 명시. 핵심:
+1. 순번제 차례 검증 (completedBy = currentTurnIndex의 멤버인지)
+2. 양방향 sync (users.groupIds ↔ groups.memberUids)
+3. currentTurnIndex 진행 (+1 mod, 비활성화 시 −1)
+4. invite code 충돌 재시도
