@@ -55,6 +55,10 @@ firestore-debug.log
 ui-debug.log
 *.cache/
 
+# playwright (test artifacts)
+.playwright-mcp/
+/*.png
+
 # logs
 logs/
 *.log
