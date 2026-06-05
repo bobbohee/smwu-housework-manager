@@ -13,20 +13,15 @@ export interface UseUserDocResult {
 }
 
 export function useUserDoc(): UseUserDocResult {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [userDoc, setUserDoc] = useState<UserDoc | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const loading = authLoading || (!!user && !subscribed);
 
   useEffect(() => {
-    if (!user) {
-      setUserDoc(null);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-    setLoading(true);
-    setError(null);
+    if (authLoading || !user) return undefined;
 
     const ref = userRef(user.uid);
     const unsub = onSnapshot(
@@ -34,7 +29,8 @@ export function useUserDoc(): UseUserDocResult {
       async (snap) => {
         if (snap.exists()) {
           setUserDoc(snap.data());
-          setLoading(false);
+          setError(null);
+          setSubscribed(true);
           return;
         }
         // 가입 시 setDoc이 race로 빠졌거나 외부에서 삭제된 경우 자가 치유.
@@ -46,20 +42,24 @@ export function useUserDoc(): UseUserDocResult {
             groupIds: [],
             createdAt: serverTimestamp(),
           });
-          // setDoc 성공하면 onSnapshot이 새 데이터로 다시 fire하므로 loading 유지
+          // setDoc 성공하면 onSnapshot이 새 데이터로 다시 fire → 다음 콜백이 subscribed 처리
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
           setError(`사용자 문서 생성 실패: ${msg}`);
-          setLoading(false);
+          setSubscribed(true);
         }
       },
       (err) => {
         setError(`Firestore 구독 실패: ${err.code} — ${err.message}`);
-        setLoading(false);
+        setSubscribed(true);
       },
     );
-    return unsub;
-  }, [user]);
+    return () => {
+      unsub();
+      setSubscribed(false);
+      setUserDoc(null);
+    };
+  }, [user, authLoading]);
 
   return { userDoc, loading, error };
 }

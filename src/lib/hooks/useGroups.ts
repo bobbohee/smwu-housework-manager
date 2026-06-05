@@ -15,26 +15,16 @@ export interface UseGroupsResult {
 export function useGroups(): UseGroupsResult {
   const { user, loading: authLoading } = useAuth();
   const [groups, setGroups] = useState<GroupDoc[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscribed, setSubscribed] = useState(false);
+
+  // loading은 derived: 인증 로딩 중이거나, 사용자 있음에도 첫 스냅샷 도착 전.
+  const loading = authLoading || (!!user && !subscribed);
 
   useEffect(() => {
-    if (authLoading) {
-      setLoading(true);
-      return;
-    }
-    if (!user) {
-      setGroups([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
+    if (authLoading || !user) return undefined;
 
     // array-contains 쿼리: rule (memberUids has uid) 와 정확히 align → Firestore secure-query 통과.
-    // documentId() in [...] 방식은 제약과 rule 불일치로 permission-denied.
     const q = query(
       groupsCol(),
       where("memberUids", "array-contains", user.uid),
@@ -51,14 +41,19 @@ export function useGroups(): UseGroupsResult {
           return aMs - bMs;
         });
         setGroups(arr);
-        setLoading(false);
+        setError(null);
+        setSubscribed(true);
       },
       (err) => {
         setError(`그룹 조회 실패: ${err.code}`);
-        setLoading(false);
+        setSubscribed(true);
       },
     );
-    return unsub;
+    return () => {
+      unsub();
+      setSubscribed(false);
+      setGroups([]);
+    };
   }, [user, authLoading]);
 
   return { groups, loading, error };

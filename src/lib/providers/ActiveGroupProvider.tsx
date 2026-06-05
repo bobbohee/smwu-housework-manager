@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -33,10 +34,19 @@ export const ActiveGroupContext = createContext<ActiveGroupContextValue>({
   error: null,
 });
 
+function readStoredId(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(STORAGE_KEY);
+}
+
 export function ActiveGroupProvider({ children }: { children: ReactNode }) {
   const { groups, loading, error } = useGroups();
   const { userDoc } = useUserDoc();
-  const [activeGroupId, setActiveGroupIdState] = useState<string | null>(null);
+
+  // 사용자 명시 선택값 또는 localStorage 초기값. lazy init으로 effect 없이 hydrate.
+  const [userSelectedId, setUserSelectedId] = useState<string | null>(() =>
+    readStoredId(),
+  );
 
   // 강퇴 후 stale: users.groupIds에 본인이 이미 빠진 그룹 id가 남아 있을 수 있음.
   // groups는 array-contains(uid)로 실제 멤버십 = 진실의 원천. 둘 비교 후 차이 제거.
@@ -52,53 +62,50 @@ export function ActiveGroupProvider({ children }: { children: ReactNode }) {
     });
   }, [loading, userDoc, groups]);
 
-  // localStorage 초기값 1회 hydrate
+  // 활성 ID는 derived. 사용자 선택값이 유효하면 그대로, 아니면 첫 그룹으로 fallback.
+  // groups 변경 시 setState 없이 자연스럽게 재계산.
+  const activeGroupId = useMemo<string | null>(() => {
+    if (loading || groups.length === 0) return null;
+    if (userSelectedId && groups.some((g) => g.id === userSelectedId)) {
+      return userSelectedId;
+    }
+    return groups[0].id;
+  }, [groups, loading, userSelectedId]);
+
+  // localStorage는 외부 시스템 → effect로 동기화 (활성 ID 변경 시).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) setActiveGroupIdState(stored);
-  }, []);
-
-  // 그룹 목록 변경 시 활성 ID 유효성 점검·자동 선택
-  useEffect(() => {
-    if (loading) return;
-    if (groups.length === 0) {
-      setActiveGroupIdState(null);
-      if (typeof window !== "undefined") {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
-      return;
+    if (activeGroupId) {
+      window.localStorage.setItem(STORAGE_KEY, activeGroupId);
+    } else if (!loading && groups.length === 0) {
+      // 로딩 중에는 stored 값 보존(다른 탭에서 그룹 추가 후 복귀 케이스).
+      window.localStorage.removeItem(STORAGE_KEY);
     }
-    const validIds = groups.map((g) => g.id);
-    if (!activeGroupId || !validIds.includes(activeGroupId)) {
-      const next = groups[0].id;
-      setActiveGroupIdState(next);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      }
-    }
-  }, [groups, loading, activeGroupId]);
+  }, [activeGroupId, loading, groups.length]);
 
   const setActiveGroupId = useCallback((id: string) => {
-    setActiveGroupIdState(id);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, id);
-    }
+    setUserSelectedId(id);
   }, []);
 
-  const activeGroup = groups.find((g) => g.id === activeGroupId) ?? null;
+  const activeGroup = useMemo(
+    () => groups.find((g) => g.id === activeGroupId) ?? null,
+    [groups, activeGroupId],
+  );
+
+  const value = useMemo<ActiveGroupContextValue>(
+    () => ({
+      groups,
+      activeGroupId,
+      activeGroup,
+      setActiveGroupId,
+      loading,
+      error,
+    }),
+    [groups, activeGroupId, activeGroup, setActiveGroupId, loading, error],
+  );
 
   return (
-    <ActiveGroupContext.Provider
-      value={{
-        groups,
-        activeGroupId,
-        activeGroup,
-        setActiveGroupId,
-        loading,
-        error,
-      }}
-    >
+    <ActiveGroupContext.Provider value={value}>
       {children}
     </ActiveGroupContext.Provider>
   );

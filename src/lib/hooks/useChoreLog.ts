@@ -32,26 +32,16 @@ export interface UseChoreLogResult {
 export function useChoreLog(opts: UseChoreLogOptions = {}): UseChoreLogResult {
   const { activeGroupId, loading: groupLoading } = useActiveGroup();
   const [logs, setLogs] = useState<ChoreLogDoc[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const loading = groupLoading || (!!activeGroupId && !subscribed);
 
   const fromMs = opts.fromDate?.getTime();
   const toMs = opts.toDate?.getTime();
 
   useEffect(() => {
-    if (groupLoading) {
-      setLoading(true);
-      return;
-    }
-    if (!activeGroupId) {
-      setLogs([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
+    if (groupLoading || !activeGroupId) return undefined;
 
     const q = query(
       choreLogCol(),
@@ -68,14 +58,19 @@ export function useChoreLog(opts: UseChoreLogOptions = {}): UseChoreLogResult {
           return bMs - aMs; // 최신순
         });
         setLogs(arr);
-        setLoading(false);
+        setError(null);
+        setSubscribed(true);
       },
       (err) => {
         setError(`완료 기록 조회 실패: ${err.code}`);
-        setLoading(false);
+        setSubscribed(true);
       },
     );
-    return unsub;
+    return () => {
+      unsub();
+      setSubscribed(false);
+      setLogs([]);
+    };
   }, [activeGroupId, groupLoading]);
 
   const filtered = useMemo(() => {

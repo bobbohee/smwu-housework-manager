@@ -6,7 +6,6 @@ import {
   type RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
 import {
-  collection,
   doc,
   getDoc,
   setDoc,
@@ -18,7 +17,6 @@ import {
   beforeAll,
   beforeEach,
   describe,
-  expect,
   it,
 } from "vitest";
 
