@@ -101,6 +101,10 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
         />
       </Field>
 
+      <Field label="색상">
+        <ColorPicker value={color} onChange={setColor} />
+      </Field>
+
       <Field label="모드">
         <ModePicker value={mode} onChange={setMode} disabled={isEdit} />
         {isEdit && (
@@ -108,10 +112,6 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
             모드는 등록 후 변경할 수 없습니다 (이력 일관성).
           </p>
         )}
-      </Field>
-
-      <Field label="색상">
-        <ColorPicker value={color} onChange={setColor} />
       </Field>
 
       {mode === "rotation" ? (

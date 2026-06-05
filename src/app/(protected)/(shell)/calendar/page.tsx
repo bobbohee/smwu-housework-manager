@@ -19,7 +19,12 @@ export default function CalendarPage() {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  // 페이지 하단 "완료 기록" 섹션에 표시할 날짜. 초기값 = 오늘.
+  const [selectedDate, setSelectedDate] = useState<string>(() =>
+    toISO(new Date()),
+  );
+  // 셀 클릭 시 다이얼로그도 함께 띄움.
+  const [dialogDate, setDialogDate] = useState<string | null>(null);
 
   const choreById = useMemo(() => {
     const map = new Map<string, ChoreDoc>();
@@ -35,49 +40,38 @@ export default function CalendarPage() {
       return { year: next.getFullYear(), month: next.getMonth() };
     });
   }
-  function goToday() {
-    const now = new Date();
-    setCursor({ year: now.getFullYear(), month: now.getMonth() });
-  }
 
   const cells = useMemo(
     () => buildMonthGrid(cursor.year, cursor.month),
     [cursor],
   );
 
-  const selectedLogs = selectedDate ? logsByDate.get(selectedDate) ?? [] : [];
+  const selectedLogs = logsByDate.get(selectedDate) ?? [];
+  const dialogLogs = dialogDate ? logsByDate.get(dialogDate) ?? [] : [];
 
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">캘린더</h1>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => shiftMonth(-1)}
-              className="rounded-md border border-border bg-surface px-2 py-1 text-sm hover:bg-background"
-              aria-label="이전 달"
-            >
-              ◀
-            </button>
-            <span className="min-w-[6.5rem] text-center text-sm font-semibold text-foreground">
-              {cursor.year}년 {cursor.month + 1}월
-            </span>
-            <button
-              onClick={() => shiftMonth(1)}
-              className="rounded-md border border-border bg-surface px-2 py-1 text-sm hover:bg-background"
-              aria-label="다음 달"
-            >
-              ▶
-            </button>
-            <button
-              onClick={goToday}
-              className="ml-1 rounded-md border border-border bg-surface px-2 py-1 text-xs hover:bg-background"
-            >
-              오늘
-            </button>
-          </div>
+      <div className="mx-auto max-w-3xl px-4 pb-6 md:px-6 md:pb-8">
+        {/* 월 네비게이션 — 와이어와 동일하게 좌우 ◀▶ + 중앙 라벨 */}
+        <div className="flex items-center justify-between border-b border-border py-3.5">
+          <button
+            onClick={() => shiftMonth(-1)}
+            className="px-2 text-lg text-muted hover:text-foreground"
+            aria-label="이전 달"
+          >
+            ◀
+          </button>
+          <span className="text-base font-bold text-foreground">
+            {cursor.year}년 {cursor.month + 1}월
+          </span>
+          <button
+            onClick={() => shiftMonth(1)}
+            className="px-2 text-lg text-muted hover:text-foreground"
+            aria-label="다음 달"
+          >
+            ▶
+          </button>
         </div>
 
         {groupLoading || logsLoading ? (
@@ -90,12 +84,13 @@ export default function CalendarPage() {
           </p>
         ) : (
           <>
-            <div className="mt-4 grid grid-cols-7 gap-px overflow-hidden rounded-xl bg-border text-xs">
+            {/* 요일 헤더 */}
+            <div className="grid grid-cols-7 gap-1 px-3 pt-2.5 pb-1.5 text-center">
               {WEEKDAY_HEADERS.map((label, i) => (
                 <div
                   key={label}
                   className={[
-                    "bg-surface px-1 py-1.5 text-center font-semibold",
+                    "text-[11px] font-semibold",
                     i === 0 && "text-chore-red",
                     i === 6 && "text-brand",
                     i !== 0 && i !== 6 && "text-muted",
@@ -104,6 +99,10 @@ export default function CalendarPage() {
                   {label}
                 </div>
               ))}
+            </div>
+
+            {/* 날짜 그리드 — gap-1, 셀 내부 박스 없음, 선택 시 brand/10 배경 */}
+            <div className="grid grid-cols-7 gap-1 px-3 pb-2 text-center">
               {cells.map((cell) => {
                 const cellLogs = logsByDate.get(cell.iso) ?? [];
                 return (
@@ -112,27 +111,50 @@ export default function CalendarPage() {
                     cell={cell}
                     logs={cellLogs}
                     choreById={choreById}
-                    onClick={() => setSelectedDate(cell.iso)}
+                    selected={cell.iso === selectedDate}
+                    onClick={() => {
+                      setSelectedDate(cell.iso);
+                      setDialogDate(cell.iso);
+                    }}
                   />
                 );
               })}
             </div>
 
-            <p className="mt-3 text-xs text-muted">
-              날짜를 누르면 그날의 완료 기록을 볼 수 있습니다. 회색 점선은
-              비활성화된 기록입니다.
-            </p>
+            {/* 선택한 날짜의 완료 기록 리스트 */}
+            <div className="border-t border-border px-1 pt-3">
+              <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wide text-muted">
+                {formatHumanDate(selectedDate)} 완료 기록
+              </p>
+              {selectedLogs.length === 0 ? (
+                <p className="rounded-lg bg-surface-2 px-3 py-2.5 text-xs text-muted">
+                  이 날짜의 완료 기록이 없습니다.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedLogs.map((log) => (
+                    <LogRow
+                      key={log.id}
+                      log={log}
+                      chore={choreById.get(log.choreId)}
+                      group={activeGroup}
+                      onClick={() => setDialogDate(selectedDate)}
+                    />
+                  ))}
+                </ul>
+              )}
+            </div>
           </>
         )}
       </div>
 
-      {selectedDate && activeGroup && (
+      {dialogDate && activeGroup && (
         <LogDetailDialog
-          date={selectedDate}
-          logs={selectedLogs}
+          date={dialogDate}
+          logs={dialogLogs}
           choreById={choreById}
           group={activeGroup}
-          onClose={() => setSelectedDate(null)}
+          onClose={() => setDialogDate(null)}
         />
       )}
     </>
@@ -151,65 +173,130 @@ function DayCell({
   cell,
   logs,
   choreById,
+  selected,
   onClick,
 }: {
   cell: DayCellInfo;
   logs: ChoreLogDoc[];
   choreById: Map<string, ChoreDoc>;
+  selected: boolean;
   onClick: () => void;
 }) {
-  const visible = logs.slice(0, 3);
-  const extra = logs.length - visible.length;
-
+  const visible = logs.slice(0, 4);
   return (
     <button
       type="button"
       onClick={onClick}
       className={[
-        "flex h-16 flex-col items-stretch bg-surface px-1.5 py-1 text-left transition hover:bg-background sm:h-20",
+        "flex flex-col items-center gap-1 rounded-md py-1.5 text-xs transition hover:bg-surface-2",
         !cell.isCurrentMonth && "opacity-40",
+        selected && "bg-brand/10",
       ].filter(Boolean).join(" ")}
     >
       <span
         className={[
           "text-[11px] font-semibold",
           cell.isToday
-            ? "self-start rounded-full bg-brand px-1.5 text-brand-foreground"
-            : cell.weekday === 0
-              ? "text-chore-red"
-              : cell.weekday === 6
-                ? "text-brand"
-                : "text-foreground",
+            ? "rounded-full bg-brand px-1.5 py-0.5 text-brand-foreground"
+            : selected
+              ? "text-brand"
+              : cell.weekday === 0
+                ? "text-chore-red"
+                : cell.weekday === 6
+                  ? "text-brand"
+                  : "text-foreground",
         ].join(" ")}
       >
         {cell.day}
       </span>
-      <div className="mt-auto flex flex-wrap gap-0.5">
+      <div className="flex min-h-[8px] flex-wrap items-center justify-center gap-[3px]">
         {visible.map((log) => {
           const chore = choreById.get(log.choreId);
           const color = chore?.color ?? "#95A5A6";
           return (
             <span
               key={log.id}
-              className={[
-                "h-1.5 w-1.5 rounded-full",
-                !log.active && "ring-1 ring-inset ring-muted",
-              ].filter(Boolean).join(" ")}
-              style={{
-                backgroundColor: log.active ? color : "transparent",
-                borderColor: !log.active ? color : undefined,
-                borderWidth: !log.active ? 1 : undefined,
-                borderStyle: !log.active ? "dashed" : undefined,
-              }}
+              className="h-[5px] w-[5px] rounded-full"
+              style={
+                log.active
+                  ? { backgroundColor: color }
+                  : {
+                      backgroundColor: "transparent",
+                      border: `1px dashed ${color}`,
+                    }
+              }
               title={chore?.name ?? "삭제된 집안일"}
             />
           );
         })}
-        {extra > 0 && (
-          <span className="text-[9px] font-bold text-muted">+{extra}</span>
-        )}
       </div>
     </button>
+  );
+}
+
+function LogRow({
+  log,
+  chore,
+  group,
+  onClick,
+}: {
+  log: ChoreLogDoc;
+  chore: ChoreDoc | undefined;
+  group: { memberNames?: Record<string, string> };
+  onClick: () => void;
+}) {
+  const nameOf = (uid: string) => group.memberNames?.[uid] ?? uid.slice(0, 6);
+  const time = log.completedAt?.toMillis?.()
+    ? new Date(log.completedAt.toMillis()).toLocaleTimeString("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+  const color = chore?.color ?? "#95A5A6";
+
+  if (!log.active) {
+    return (
+      <li
+        onClick={onClick}
+        className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border bg-surface-2 px-3 py-2.5 opacity-75"
+      >
+        <span
+          className="h-2 w-2 shrink-0 rounded-full bg-dim"
+          aria-hidden
+        />
+        <span className="flex-1 text-sm">
+          <span className="font-semibold text-dim line-through">
+            {chore?.name ?? "(삭제된 집안일)"}
+          </span>
+          <span className="text-dim"> : {nameOf(log.completedBy)}</span>
+        </span>
+        <span className="text-[10px] font-semibold text-chore-red">비활성화</span>
+      </li>
+    );
+  }
+
+  return (
+    <li
+      onClick={onClick}
+      className="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5"
+      style={{
+        backgroundColor: hexAlpha(color, 10),
+        borderColor: hexAlpha(color, 35),
+      }}
+    >
+      <span
+        className="h-2 w-2 shrink-0 rounded-full"
+        style={{ backgroundColor: color }}
+        aria-hidden
+      />
+      <span className="flex-1 text-sm">
+        <span className="font-semibold text-foreground">
+          {chore?.name ?? "(삭제된 집안일)"}
+        </span>
+        <span className="text-muted"> : {nameOf(log.completedBy)}</span>
+      </span>
+      <span className="text-[10px] text-muted">{time}</span>
+    </li>
   );
 }
 
@@ -246,6 +333,20 @@ function toISO(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
+function formatHumanDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const day = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+  return `${m}월 ${d}일 (${day})`;
+}
+
+function hexAlpha(hex: string, pct: number): string {
+  const a = Math.round((pct / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+  return `${hex}${a}`;
+}
+
 function groupLogsByLocalDate(logs: ChoreLogDoc[]): Map<string, ChoreLogDoc[]> {
   const map = new Map<string, ChoreLogDoc[]>();
   for (const log of logs) {
@@ -258,4 +359,3 @@ function groupLogsByLocalDate(logs: ChoreLogDoc[]): Map<string, ChoreLogDoc[]> {
   }
   return map;
 }
-

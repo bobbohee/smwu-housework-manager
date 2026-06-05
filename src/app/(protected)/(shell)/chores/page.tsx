@@ -68,11 +68,20 @@ function ChoreList({ chores }: { chores: ChoreDoc[] }) {
   );
 }
 
+function hexAlpha(hex: string, pct: number): string {
+  const a = Math.round((pct / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+  return `${hex}${a}`;
+}
+
 function ChoreRow({ chore }: { chore: ChoreDoc }) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onDelete() {
+  async function onDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     if (!confirm(`"${chore.name}"을(를) 삭제할까요? 기존 완료 기록은 보존됩니다.`)) {
       return;
     }
@@ -88,15 +97,20 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
 
   return (
     <li
-      className="flex items-center gap-3 rounded-xl bg-surface p-3 shadow-sm ring-1 ring-border"
-      style={{ borderLeft: `4px solid ${chore.color}` }}
+      className="flex items-center gap-3 rounded-xl border px-3 py-3"
+      style={{
+        backgroundColor: hexAlpha(chore.color, 10),
+        borderColor: hexAlpha(chore.color, 35),
+      }}
     >
-      <Link
-        href={`/chores/${chore.id}`}
-        className="flex-1 min-w-0"
-      >
-        <p className="truncate text-sm font-semibold text-foreground">{chore.name}</p>
-        <p className="mt-0.5 text-xs text-muted">
+      <span
+        className="h-2.5 w-2.5 shrink-0 rounded-full"
+        style={{ backgroundColor: chore.color }}
+        aria-hidden
+      />
+      <Link href={`/chores/${chore.id}`} className="flex-1 min-w-0">
+        <p className="truncate text-sm font-bold text-foreground">{chore.name}</p>
+        <p className="mt-0.5 text-[11px] text-muted">
           {chore.mode === "rotation"
             ? `순번제 · 참여 ${chore.rotationOrder.length}명`
             : `고정제 · 스케줄 ${chore.fixedSchedule.length}건`}
@@ -107,11 +121,18 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
       <button
         onClick={onDelete}
         disabled={deleting}
-        className="rounded-md border border-border bg-background px-2.5 py-1 text-xs text-muted hover:text-chore-red disabled:opacity-50"
+        className="rounded-md border border-border bg-surface px-2 py-1 text-[11px] text-muted hover:text-chore-red disabled:opacity-50"
         title="삭제"
       >
         {deleting ? "…" : "삭제"}
       </button>
+      <Link
+        href={`/chores/${chore.id}`}
+        className="text-muted hover:text-foreground"
+        aria-label="편집"
+      >
+        ›
+      </Link>
 
       {error && (
         <p className="ml-2 text-xs text-chore-red">{error}</p>

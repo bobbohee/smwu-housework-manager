@@ -23,7 +23,6 @@ export function LogDetailDialog({
   group,
   onClose,
 }: LogDetailDialogProps) {
-  // ESC 닫기
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -36,18 +35,20 @@ export function LogDetailDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/35 p-4 sm:items-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-surface p-5 shadow-xl"
+        className="w-full max-w-md rounded-xl border border-border bg-surface p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-foreground">{date}</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-bold text-foreground">
+            {formatHumanDate(date)} 완료 상세
+          </h2>
           <button
             onClick={onClose}
-            className="rounded p-1 text-muted hover:bg-background"
+            className="text-lg text-muted hover:text-foreground"
             aria-label="닫기"
           >
             ✕
@@ -55,11 +56,11 @@ export function LogDetailDialog({
         </div>
 
         {logs.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">이 날짜의 완료 기록이 없습니다.</p>
+          <p className="text-sm text-muted">이 날짜의 완료 기록이 없습니다.</p>
         ) : (
-          <ul className="mt-4 space-y-2">
+          <ul className="space-y-4">
             {logs.map((log) => (
-              <LogRow
+              <LogDetail
                 key={log.id}
                 log={log}
                 chore={choreById.get(log.choreId)}
@@ -73,7 +74,14 @@ export function LogDetailDialog({
   );
 }
 
-function LogRow({
+function formatHumanDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const day = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+  return `${y}.${String(m).padStart(2, "0")}.${String(d).padStart(2, "0")} (${day})`;
+}
+
+function LogDetail({
   log,
   chore,
   group,
@@ -87,53 +95,118 @@ function LogRow({
 
   const nameOf = (uid: string) => group.memberNames?.[uid] ?? uid.slice(0, 6);
   const time = log.completedAt?.toMillis?.()
-    ? new Date(log.completedAt.toMillis()).toLocaleTimeString("ko-KR", {
+    ? new Date(log.completedAt.toMillis()).toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
       })
     : "";
-  const proxyHint =
-    log.completedByActual !== log.completedBy
-      ? ` (실제: ${nameOf(log.completedByActual)})`
-      : "";
-  const typeBadge =
-    log.type === "random" ? "🎲 꽝뽑기" : "🔄 순번";
+  const deactTime = log.deactivatedAt?.toMillis?.()
+    ? new Date(log.deactivatedAt.toMillis()).toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+  const typeLabel = log.type === "random" ? "꽝뽑기" : "순번제";
+  const proxy = log.completedByActual !== log.completedBy;
+  const color = chore?.color ?? "#95A5A6";
 
   return (
-    <li
-      className={[
-        "rounded-lg bg-background p-3",
-        !log.active && "opacity-60 ring-1 ring-dashed ring-muted",
-      ].filter(Boolean).join(" ")}
-    >
-      <div className="flex items-center gap-2">
+    <li className="space-y-2.5">
+      <Row label="집안일">
         <span
-          className="h-2.5 w-2.5 shrink-0 rounded-full"
-          style={{ backgroundColor: chore?.color ?? "#95A5A6" }}
-          aria-hidden
-        />
-        <span className="text-sm font-semibold text-foreground">
-          {chore?.name ?? "(삭제된 집안일)"}
+          className={[
+            "inline-flex items-center gap-1.5 font-semibold",
+            !log.active && "text-dim line-through",
+          ].filter(Boolean).join(" ")}
+          style={{ color: log.active ? undefined : undefined }}
+        >
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: color }}
+            aria-hidden
+          />
+          <span className={log.active ? "text-foreground" : "text-dim"}>
+            {chore?.name ?? "(삭제된 집안일)"}
+          </span>
         </span>
-        <span className="ml-auto text-[10px] text-muted">{typeBadge}</span>
-      </div>
-      <p className="mt-1 text-xs text-muted">
-        {nameOf(log.completedBy)}
-        {proxyHint} · {time}
-      </p>
-
+      </Row>
+      <Row label="담당자(차례)">
+        <span className={log.active ? "font-semibold text-foreground" : "font-semibold text-dim"}>
+          {nameOf(log.completedBy)}
+        </span>
+      </Row>
+      {proxy && (
+        <Row label="실제 완료">
+          <span className="font-semibold text-foreground">
+            {nameOf(log.completedByActual)}
+          </span>
+        </Row>
+      )}
+      <Row label="완료 시간">
+        <span className={log.active ? "font-semibold text-foreground" : "font-semibold text-dim"}>
+          {time}
+        </span>
+      </Row>
+      <Row label="유형">
+        <span className={log.active ? "font-semibold text-foreground" : "font-semibold text-dim"}>
+          {typeLabel}
+        </span>
+      </Row>
+      <Row label="상태">
+        {log.active ? (
+          <span className="font-semibold text-chore-green">활성</span>
+        ) : (
+          <span className="font-semibold text-chore-red">비활성화</span>
+        )}
+      </Row>
       {!log.active && (
-        <p className="mt-1 rounded bg-chore-red/10 px-2 py-1 text-[11px] text-chore-red">
-          비활성화됨 — {log.deactivateReason ?? "사유 없음"}
-          {log.deactivatedBy &&
-            ` (by ${nameOf(log.deactivatedBy)})`}
-        </p>
+        <>
+          <Row label="처리자">
+            <span className="font-semibold text-dim">
+              {log.deactivatedBy ? nameOf(log.deactivatedBy) : "—"}
+            </span>
+          </Row>
+          {deactTime && (
+            <Row label="처리 시간">
+              <span className="font-semibold text-dim">{deactTime}</span>
+            </Row>
+          )}
+          <div className="rounded-lg border border-chore-red/25 bg-chore-red/5 px-3 py-2">
+            <p className="mb-0.5 text-[11px] font-semibold text-chore-red">
+              비활성화 사유
+            </p>
+            <p className="text-xs text-foreground">
+              {log.deactivateReason ?? "(사유 없음)"}
+            </p>
+          </div>
+        </>
       )}
 
       {isOwner && log.active && user && (
         <DeactivateButton logId={log.id} ownerUid={user.uid} />
       )}
     </li>
+  );
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between text-sm">
+      <span className="text-muted">{label}</span>
+      <span>{children}</span>
+    </div>
   );
 }
 
@@ -162,35 +235,30 @@ function DeactivateButton({ logId, ownerUid }: { logId: string; ownerUid: string
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-2 rounded-md border border-border bg-surface px-2 py-1 text-[11px] text-muted hover:text-chore-red"
+        className="w-full rounded-lg border border-chore-red/40 bg-transparent py-2.5 text-sm font-semibold text-chore-red hover:bg-chore-red/5"
       >
-        비활성화…
+        비활성화
       </button>
     );
   }
 
   return (
-    <div className="mt-2 space-y-2 rounded-md bg-surface p-2">
+    <div className="space-y-2 rounded-lg bg-surface-2 p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+        비활성화 사유 (필수)
+      </p>
       <textarea
         rows={2}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
-        placeholder="비활성화 사유 (필수)"
+        placeholder="예: 음식물쓰레기를 비우지 않음"
         maxLength={200}
-        className="input text-xs"
+        className="input text-sm"
       />
       {error && (
-        <p className="text-[11px] text-chore-red">{error}</p>
+        <p className="text-xs text-chore-red">{error}</p>
       )}
-      <div className="flex gap-1">
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={submitting || !reason.trim()}
-          className="flex-1 rounded-md bg-chore-red px-2 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-40"
-        >
-          {submitting ? "처리 중…" : "비활성화"}
-        </button>
+      <div className="flex gap-2">
         <button
           type="button"
           onClick={() => {
@@ -198,9 +266,17 @@ function DeactivateButton({ logId, ownerUid }: { logId: string; ownerUid: string
             setReason("");
             setError(null);
           }}
-          className="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
+          className="flex-1 rounded-lg border border-border bg-surface py-2 text-sm font-semibold text-muted"
         >
           취소
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={submitting || !reason.trim()}
+          className="flex-[2] rounded-lg bg-chore-red py-2 text-sm font-bold text-white hover:opacity-90 disabled:opacity-40"
+        >
+          {submitting ? "처리 중…" : "비활성화"}
         </button>
       </div>
     </div>

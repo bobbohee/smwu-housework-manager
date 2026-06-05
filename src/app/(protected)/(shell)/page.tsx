@@ -178,23 +178,21 @@ function FixedDutySection({
   if (items.length === 0) return null;
 
   return (
-    <section className="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-border">
-      <h2 className="text-sm font-semibold text-muted">📌 오늘의 고정 집안일</h2>
-      <ul className="mt-3 space-y-2">
+    <section className="rounded-lg border border-chore-green/35 bg-chore-green/10 px-3 py-2.5">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-chore-green">
+        오늘의 고정 집안일
+      </p>
+      <ul className="mt-1.5 space-y-1">
         {items.map(({ chore, dutyUids }) => (
-          <li
-            key={chore.id}
-            className="flex items-center gap-3 rounded-lg bg-background px-3 py-2"
-          >
+          <li key={chore.id} className="flex items-center gap-2 text-sm">
             <span
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: chore.color }}
               aria-hidden
             />
-            <span className="text-sm font-medium text-foreground">
-              {chore.name}
-            </span>
-            <span className="ml-auto text-sm text-muted">
+            <span className="font-medium text-foreground">{chore.name}</span>
+            <span className="text-muted">—</span>
+            <span className="font-semibold text-foreground">
               {dutyUids.map((uid) => memberName(group, uid)).join(", ")}
             </span>
           </li>
@@ -224,8 +222,10 @@ function RotationSection({
 
   return (
     <section>
-      <h2 className="text-sm font-semibold text-muted">🔄 순번 집안일</h2>
-      <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+        순번제 집안일
+      </p>
+      <ul className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {chores.map((chore) => (
           <RotationCard
             key={chore.id}
@@ -237,6 +237,13 @@ function RotationSection({
       </ul>
     </section>
   );
+}
+
+function hexAlpha(hex: string, pct: number): string {
+  const a = Math.round((pct / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+  return `${hex}${a}`;
 }
 
 function RotationCard({
@@ -273,50 +280,45 @@ function RotationCard({
 
   return (
     <li
-      className="flex flex-col rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-border"
-      style={{ borderTop: `4px solid ${chore.color}` }}
+      className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-3 text-center"
+      style={{
+        backgroundColor: hexAlpha(chore.color, 10),
+        borderColor: hexAlpha(chore.color, 35),
+      }}
     >
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-base font-semibold text-foreground">{chore.name}</h3>
-        {chore.allowProxyComplete && (
-          <span className="rounded-full bg-background px-2 py-0.5 text-[10px] font-medium text-muted">
-            대신 완료 허용
-          </span>
-        )}
-      </div>
-
-      <div className="mt-2 text-sm">
-        <span className="text-muted">차례: </span>
-        {hasMembers && turnUid ? (
-          <span
-            className={`font-semibold ${isMyTurn ? "text-brand" : "text-foreground"}`}
-          >
-            {memberName(group, turnUid)}
-            {isMyTurn ? " (나)" : ""}
-          </span>
-        ) : (
-          <span className="text-muted">참여 멤버 미설정</span>
-        )}
-      </div>
-
-      {chore.rules.length > 0 && (
-        <ul className="mt-2 space-y-0.5 text-xs text-muted">
-          {chore.rules.map((rule, i) => (
-            <li key={i}>· {rule}</li>
-          ))}
-        </ul>
+      <p
+        className="text-sm font-bold leading-tight"
+        style={{ color: chore.color }}
+      >
+        {chore.name}
+      </p>
+      {hasMembers && turnUid ? (
+        <p className="text-sm font-bold leading-tight text-foreground">
+          {memberName(group, turnUid)}
+          {isMyTurn && (
+            <span className="ml-0.5 text-[10px] font-semibold text-brand">
+              (나)
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="text-[11px] text-muted">참여 멤버 미설정</p>
       )}
-
       <button
         onClick={onComplete}
         disabled={!canComplete || submitting}
-        className="mt-3 rounded-lg bg-brand py-2 text-sm font-semibold text-brand-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-1 rounded-md px-3 py-1 text-[11px] font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40"
+        style={{
+          backgroundColor: canComplete && !submitting ? chore.color : "#9aa3af",
+        }}
       >
         {submitting ? "처리 중…" : "완료"}
       </button>
-
+      {chore.allowProxyComplete && (
+        <span className="text-[9px] text-muted">대신 완료 허용</span>
+      )}
       {error && (
-        <p className="mt-2 rounded-md bg-chore-red/10 px-2 py-1 text-xs text-chore-red">
+        <p className="rounded bg-chore-red/10 px-1.5 py-0.5 text-[10px] text-chore-red">
           {error}
         </p>
       )}
