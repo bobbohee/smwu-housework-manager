@@ -4,7 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 프로젝트 상태
 
-**구현 진행 중** — 1주차(인프라·인증·그룹) 완료. 2주차부터 집안일·캘린더·통계 진행 예정.
+**구현 진행 중** — 1주차(인프라·인증·그룹) + 2주차(집안일 핵심·캘린더) 완료. 3주차(통계·꽝뽑기·배포) 진행 예정.
+
+2주차 산출물 요약:
+- 집안일 CRUD + 8개 프리셋 + 그룹 생성 시 선택 UI
+- 순번제 완료(`completeRotation`) + 차례 진행 batch
+- 고정제 스케줄(weekly/interval) + 홈 "오늘의 고정 집안일" 알림
+- 캘린더 월별 그리드 + 색상 점 + 하단 완료 기록 리스트
+- LogDetailDialog (Row 정렬 + 비활성화 + 차례 복원)
+- `lib/chore/rotation.ts`·`fixed-schedule.ts` pure 함수 분리 + 단위 테스트 40개
+- 와이어프레임 시각 동기화 (색상 토큰·홈 카드·캘린더·다이얼로그·집안일 카드)
+- `groups.memberNames` 캐시 (다른 멤버 이름 노출 영구 해결)
 
 설계 산출물:
 - `docs/superpowers/specs/2026-03-31-house-chore-manager-design.md` — **단일 진실 공급원(SSOT)**. 기능·데이터 모델·페이지 구성 정의.
@@ -42,6 +52,7 @@ npm run emulators        # auth + firestore 에뮬레이터 수동 기동
 `users`, `groups`, `chores`, `choreLog`, **`inviteCodes`**. 마지막은 구현 단계에서 추가된 lookup 전용 컬렉션 (`{code: groupId}` 매핑, 비멤버 합류 진입점). 전체 스키마는 스펙 문서 "데이터 구조" 절 + `docs/security-rules-matrix.md` 참조. 여러 화면에 걸쳐 적용되는 핵심 관계와 불변식:
 
 - **다대다 그룹 멤버십**: `users.groupIds[]` ↔ `groups.memberUids[]` 를 양방향으로 동기화해야 한다. 한 계정이 여러 그룹 소속 가능. 홈 상단에서 그룹 전환.
+- **`groups.memberNames` 캐시**: `Record<string, string>` (uid → name). users 컬렉션은 self만 read 가능하므로 다른 멤버 이름 노출용 캐시. createGroup/joinGroup/kick/leave 시 양방향 sync.
 - **순번제(rotation) chore**: `rotationOrder[]`(참여 멤버 + 순서) + `currentTurnIndex`로 현재 차례를 관리. 참여 멤버를 chore별로 다르게 설정 가능(전체 그룹 멤버 ≠ 참여 멤버). `allowProxyComplete`(기본 false)로 대신 완료 허용 여부 제어.
 - **프리셋은 복사본**: 그룹 생성 시 범용 프리셋을 선택하면 chores에 복사본으로 생성된다(참조 아님). 그룹별 자유 수정/삭제 가능. 앱에 가정-특화 하드코딩 값 없음.
 - **고정제(fixed) chore**: `fixedSchedule[]`로 담당자별 일정 지정. `type: "weekly"`(요일) 또는 `type: "interval"`(N일 주기 + startDate). **완료 기록을 남기지 않으며** 홈에서 알림만 표시. 캘린더/통계 집계 대상이 아님.
@@ -79,12 +90,18 @@ npm run emulators        # auth + firestore 에뮬레이터 수동 기동
 | `src/lib/firebase/collections.ts` | 타입 안전 ref helper |
 | `src/lib/firebase/errors.ts` | Auth 에러 코드 한국어 매핑 |
 | `src/lib/group/invite-code.ts` | 6자 코드 생성·검증 (혼동문자 제외) |
-| `src/lib/group/operations.ts` | createGroup/joinGroup/updateName/transfer/kick/leave |
+| `src/lib/group/operations.ts` | createGroup/joinGroup/updateName/transfer/kick/leave + memberNames sync |
+| `src/lib/chore/operations.ts` | CRUD + completeRotation/recordRandomDraw/deactivateChoreLog + COLOR_PALETTE |
+| `src/lib/chore/rotation.ts` | nextTurnIndex·restoreTurnIndex·checkCompletionPermission (pure) |
+| `src/lib/chore/fixed-schedule.ts` | isOnDutyToday·dutyUidsForToday (weekly/interval pure) |
+| `src/lib/chore/presets.ts` | 8개 프리셋 + createChoresFromPresets batch |
 | `src/lib/providers/AuthProvider.tsx` | onAuthStateChanged 구독 |
-| `src/lib/providers/ActiveGroupProvider.tsx` | 활성 그룹 + stale 자가 정리 |
-| `src/lib/hooks/useAuth·useUserDoc·useGroups·useActiveGroup` | 상태 hook |
+| `src/lib/providers/ActiveGroupProvider.tsx` | 활성 그룹 + stale 자가 정리 (derived selection) |
+| `src/lib/hooks/useAuth·useUserDoc·useGroups·useActiveGroup·useChores·useChoreLog` | 상태 hook (subscribed 플래그 패턴) |
 | `src/components/nav/*` | Sidebar·BottomTabs·AppShell·PlaceholderPage |
 | `src/components/group/GroupBar·GroupSwitcher` | 그룹 전환 UI |
+| `src/components/chore/ChoreForm.tsx` | 추가/편집 공통 폼 (이름·색상·모드·참여멤버·스케줄·규칙) |
+| `src/components/chore/LogDetailDialog.tsx` | 캘린더 셀 상세 + 방장 비활성화 액션 |
 
 ## 클라이언트 책임 (Rules가 안 막는 검증)
 
