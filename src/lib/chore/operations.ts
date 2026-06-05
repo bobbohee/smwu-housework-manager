@@ -19,6 +19,11 @@ import type {
   ChoreMode,
   FixedScheduleEntry,
 } from "@/lib/types/firestore";
+import {
+  checkCompletionPermission,
+  nextTurnIndex as computeNextTurnIndex,
+  restoreTurnIndex,
+} from "@/lib/chore/rotation";
 
 export const COLOR_PALETTE = [
   "#4A90D9",
@@ -156,25 +161,23 @@ export async function completeRotation(
   if (chore.mode !== "rotation") {
     throw new ChoreError("순번제 집안일이 아닙니다.");
   }
-  if (chore.rotationOrder.length === 0) {
-    throw new ChoreError("참여 멤버가 없습니다.");
-  }
-  const turnUid = chore.rotationOrder[chore.currentTurnIndex];
-  if (!turnUid) {
-    throw new ChoreError("현재 차례 정보가 올바르지 않습니다.");
-  }
 
-  if (chore.allowProxyComplete) {
-    if (!chore.rotationOrder.includes(input.actualUid)) {
-      throw new ChoreError("참여 멤버만 완료할 수 있습니다.");
-    }
-  } else if (input.actualUid !== turnUid) {
-    throw new ChoreError("본인 차례가 아닙니다.");
+  const check = checkCompletionPermission(
+    chore.rotationOrder,
+    chore.currentTurnIndex,
+    chore.allowProxyComplete,
+    input.actualUid,
+  );
+  if (!check.ok) {
+    throw new ChoreError(reasonToMessage(check.reason));
   }
+  const turnUid = check.turnUid;
 
   const newLogRef = doc(choreLogCol());
-  const nextTurnIndex =
-    (chore.currentTurnIndex + 1) % chore.rotationOrder.length;
+  const nextTurnIndex = computeNextTurnIndex(
+    chore.currentTurnIndex,
+    chore.rotationOrder.length,
+  );
 
   const batch = writeBatch(db);
   batch.set(newLogRef, {
@@ -269,12 +272,29 @@ export async function deactivateChoreLog(
     if (choreSnap.exists()) {
       const chore = choreSnap.data();
       if (chore.mode === "rotation" && chore.rotationOrder.length > 0) {
-        const len = chore.rotationOrder.length;
-        const restored = (chore.currentTurnIndex - 1 + len) % len;
+        const restored = restoreTurnIndex(
+          chore.currentTurnIndex,
+          chore.rotationOrder.length,
+        );
         batch.update(choreRef(log.choreId), { currentTurnIndex: restored });
       }
     }
   }
 
   await batch.commit();
+}
+
+function reasonToMessage(reason: string): string {
+  switch (reason) {
+    case "no-members":
+      return "참여 멤버가 없습니다.";
+    case "bad-index":
+      return "현재 차례 정보가 올바르지 않습니다.";
+    case "not-your-turn":
+      return "본인 차례가 아닙니다.";
+    case "not-participant":
+      return "참여 멤버만 완료할 수 있습니다.";
+    default:
+      return "완료할 수 없습니다.";
+  }
 }
