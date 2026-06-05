@@ -34,14 +34,19 @@ export function useUserDoc(): UseUserDocResult {
           return;
         }
         // 가입 시 setDoc이 race로 빠졌거나 외부에서 삭제된 경우 자가 치유.
+        // merge: true — signUp의 setDoc과 동시 발생해도 필드 충돌 없이 안전.
         try {
-          await setDoc(ref, {
-            uid: user.uid,
-            name: user.displayName ?? user.email ?? "",
-            email: user.email ?? "",
-            groupIds: [],
-            createdAt: serverTimestamp(),
-          });
+          await setDoc(
+            ref,
+            {
+              uid: user.uid,
+              name: user.displayName ?? user.email ?? "",
+              email: user.email ?? "",
+              groupIds: [],
+              createdAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
           // setDoc 성공하면 onSnapshot이 새 데이터로 다시 fire → 다음 콜백이 subscribed 처리
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
