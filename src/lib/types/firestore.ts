@@ -14,6 +14,8 @@ export interface GroupDoc {
   inviteCode: string;
   ownerId: string;
   memberUids: string[];
+  /** uid → 회원가입 시점 user.name 캐시. users 컬렉션은 self만 read 가능하므로 멤버 이름 노출용. */
+  memberNames: Record<string, string>;
   createdAt: Timestamp;
 }
 

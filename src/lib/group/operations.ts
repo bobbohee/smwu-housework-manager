@@ -1,6 +1,7 @@
 import {
   arrayRemove,
   arrayUnion,
+  deleteField,
   doc,
   getDoc,
   serverTimestamp,
@@ -32,9 +33,11 @@ export interface CreateGroupResult {
 export async function createGroup(
   name: string,
   uid: string,
+  userName: string,
 ): Promise<CreateGroupResult> {
   const trimmed = name.trim();
   if (!trimmed) throw new GroupError("그룹 이름을 입력해주세요.");
+  if (!userName.trim()) throw new GroupError("사용자 이름이 비어있습니다.");
 
   const db = getDb();
 
@@ -52,6 +55,7 @@ export async function createGroup(
       inviteCode: code,
       ownerId: uid,
       memberUids: [uid],
+      memberNames: { [uid]: userName },
       createdAt: serverTimestamp(),
     });
 
@@ -76,11 +80,13 @@ export async function createGroup(
 export async function joinGroup(
   rawCode: string,
   uid: string,
+  userName: string,
 ): Promise<string> {
   const code = normalizeInviteCode(rawCode);
   if (!isValidInviteCode(code)) {
     throw new GroupError("올바른 초대 코드 형식이 아닙니다.");
   }
+  if (!userName.trim()) throw new GroupError("사용자 이름이 비어있습니다.");
 
   const db = getDb();
   const inviteSnap = await getDoc(inviteCodeRef(code));
@@ -91,7 +97,10 @@ export async function joinGroup(
   const { groupId } = inviteSnap.data();
 
   const batch = writeBatch(db);
-  batch.update(groupRef(groupId), { memberUids: arrayUnion(uid) });
+  batch.update(groupRef(groupId), {
+    memberUids: arrayUnion(uid),
+    [`memberNames.${uid}`]: userName,
+  });
   batch.update(userRef(uid), { groupIds: arrayUnion(groupId) });
   await batch.commit();
 
@@ -131,6 +140,7 @@ export async function kickMember(
   // 강퇴된 사용자 doc의 groupIds는 자가 정리 hook(stale id 청소)이 처리.
   await updateDoc(groupRef(groupId), {
     memberUids: arrayRemove(memberUid),
+    [`memberNames.${memberUid}`]: deleteField(),
   });
 }
 
@@ -144,7 +154,10 @@ export async function leaveGroup(
   }
   const db = getDb();
   const batch = writeBatch(db);
-  batch.update(groupRef(groupId), { memberUids: arrayRemove(uid) });
+  batch.update(groupRef(groupId), {
+    memberUids: arrayRemove(uid),
+    [`memberNames.${uid}`]: deleteField(),
+  });
   batch.update(userRef(uid), { groupIds: arrayRemove(groupId) });
   await batch.commit();
 }

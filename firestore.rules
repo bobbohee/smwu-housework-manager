@@ -87,7 +87,7 @@ service cloud.firestore {
                     && resource.data.memberUids.hasAll(
                          request.resource.data.memberUids.removeAll([request.auth.uid])
                        )
-                    && onlyChanged(['memberUids']);
+                    && onlyChanged(['memberUids', 'memberNames']);
 
       // c) 탈퇴 (방장 제외)
       allow update: if isSignedIn()
@@ -98,7 +98,7 @@ service cloud.firestore {
                     && request.resource.data.memberUids.hasAll(
                          resource.data.memberUids.removeAll([request.auth.uid])
                        )
-                    && onlyChanged(['memberUids']);
+                    && onlyChanged(['memberUids', 'memberNames']);
 
       allow delete: if isOwner();
     }

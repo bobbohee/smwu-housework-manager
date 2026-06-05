@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useUserDoc } from "@/lib/hooks/useUserDoc";
 import { GroupError, createGroup } from "@/lib/group/operations";
 
 export default function NewGroupPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { userDoc } = useUserDoc();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,11 +21,11 @@ export default function NewGroupPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !userDoc) return;
     setError(null);
     setSubmitting(true);
     try {
-      const result = await createGroup(name, user.uid);
+      const result = await createGroup(name, user.uid, userDoc.name);
       setSuccess({ groupId: result.groupId, code: result.inviteCode });
     } catch (err) {
       setError(err instanceof GroupError ? err.message : "그룹 생성 실패.");

@@ -4,22 +4,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useUserDoc } from "@/lib/hooks/useUserDoc";
 import { GroupError, joinGroup } from "@/lib/group/operations";
 
 export default function JoinGroupPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { userDoc } = useUserDoc();
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !userDoc) return;
     setError(null);
     setSubmitting(true);
     try {
-      await joinGroup(code, user.uid);
+      await joinGroup(code, user.uid, userDoc.name);
       router.replace("/");
     } catch (err) {
       setError(err instanceof GroupError ? err.message : "합류 실패.");
