@@ -6,6 +6,7 @@ import { GroupBar } from "@/components/group/GroupBar";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
 import { ChoreError, deleteChore } from "@/lib/chore/operations";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 import type { ChoreDoc } from "@/lib/types/firestore";
 
 export default function ChoresPage() {
@@ -90,7 +91,11 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
     try {
       await deleteChore(chore.id);
     } catch (err) {
-      setError(err instanceof ChoreError ? err.message : "삭제 실패.");
+      setError(
+        err instanceof ChoreError
+          ? err.message
+          : mapFirestoreError(err, "삭제 실패."),
+      );
       setDeleting(false);
     }
   }

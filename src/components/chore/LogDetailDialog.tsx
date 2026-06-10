@@ -7,6 +7,7 @@ import {
 } from "@/lib/chore/operations";
 import type { ChoreDoc, ChoreLogDoc, GroupDoc } from "@/lib/types/firestore";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 
 export interface LogDetailDialogProps {
   date: string; // YYYY-MM-DD
@@ -224,7 +225,11 @@ function DeactivateButton({ logId, ownerUid }: { logId: string; ownerUid: string
       setOpen(false);
       setReason("");
     } catch (err) {
-      setError(err instanceof ChoreError ? err.message : "비활성화 실패.");
+      setError(
+        err instanceof ChoreError
+          ? err.message
+          : mapFirestoreError(err, "비활성화 실패."),
+      );
     } finally {
       setSubmitting(false);
     }

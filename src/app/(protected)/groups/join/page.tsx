@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useUserDoc } from "@/lib/hooks/useUserDoc";
 import { GroupError, joinGroup } from "@/lib/group/operations";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 
 export default function JoinGroupPage() {
   const router = useRouter();
@@ -24,7 +25,11 @@ export default function JoinGroupPage() {
       await joinGroup(code, user.uid, userDoc.name);
       router.replace("/");
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "합류 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "합류 실패."),
+      );
     } finally {
       setSubmitting(false);
     }

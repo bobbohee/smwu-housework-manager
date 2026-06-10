@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useUserDoc } from "@/lib/hooks/useUserDoc";
 import { GroupError, createGroup } from "@/lib/group/operations";
 import { CHORE_PRESETS, createChoresFromPresets } from "@/lib/chore/presets";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 
 export default function NewGroupPage() {
   const router = useRouter();
@@ -61,7 +62,11 @@ export default function NewGroupPage() {
         presetCount,
       });
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "그룹 생성 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "그룹 생성 실패."),
+      );
     } finally {
       setSubmitting(false);
     }

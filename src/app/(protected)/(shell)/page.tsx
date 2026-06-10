@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
 import { signOut } from "@/lib/firebase/auth";
-import { mapAuthError } from "@/lib/firebase/errors";
+import { mapAuthError, mapFirestoreError } from "@/lib/firebase/errors";
 import { GroupBar } from "@/components/group/GroupBar";
 import { ChoreError, completeRotation } from "@/lib/chore/operations";
 import { dutyUidsForToday } from "@/lib/chore/fixed-schedule";
@@ -272,7 +272,11 @@ function RotationCard({
     try {
       await completeRotation({ choreId: chore.id, actualUid: myUid });
     } catch (err) {
-      setError(err instanceof ChoreError ? err.message : "완료 처리 실패.");
+      setError(
+        err instanceof ChoreError
+          ? err.message
+          : mapFirestoreError(err, "완료 처리 실패."),
+      );
     } finally {
       setSubmitting(false);
     }

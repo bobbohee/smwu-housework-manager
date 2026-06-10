@@ -16,6 +16,7 @@ import type {
   FixedScheduleEntry,
   GroupDoc,
 } from "@/lib/types/firestore";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 
 const WEEKDAY_LABELS: Record<number, string> = {
   0: "일",
@@ -82,7 +83,11 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
       }
       router.push("/chores");
     } catch (err) {
-      setError(err instanceof ChoreError ? err.message : "저장 실패.");
+      setError(
+        err instanceof ChoreError
+          ? err.message
+          : mapFirestoreError(err, "저장 실패."),
+      );
       setSubmitting(false);
     }
   }
