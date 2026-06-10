@@ -12,6 +12,7 @@ import {
   updateGroupName,
 } from "@/lib/group/operations";
 import { GroupBar } from "@/components/group/GroupBar";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function SettingsPage() {
 
             <MemberSection
               memberUids={activeGroup.memberUids}
+              memberNames={activeGroup.memberNames}
               ownerId={activeGroup.ownerId}
               myUid={user.uid}
               myDisplayName={user.displayName ?? user.email ?? "나"}
@@ -118,7 +120,11 @@ function NameSection({
       await updateGroupName(groupId, draft);
       setEditing(false);
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "이름 변경 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "이름 변경 실패."),
+      );
     } finally {
       setBusy(false);
     }
@@ -218,6 +224,7 @@ function InviteCodeSection({ code }: { code: string }) {
 
 function MemberSection({
   memberUids,
+  memberNames,
   ownerId,
   myUid,
   myDisplayName,
@@ -227,6 +234,7 @@ function MemberSection({
   setBusy,
 }: {
   memberUids: string[];
+  memberNames: Record<string, string>;
   ownerId: string;
   myUid: string;
   myDisplayName: string;
@@ -244,7 +252,11 @@ function MemberSection({
     try {
       await transferOwnership(groupId, toUid);
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "방장 위임 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "방장 위임 실패."),
+      );
     } finally {
       setBusy(false);
     }
@@ -257,7 +269,11 @@ function MemberSection({
     try {
       await kickMember(groupId, targetUid, myUid);
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "강퇴 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "강퇴 실패."),
+      );
     } finally {
       setBusy(false);
     }
@@ -271,7 +287,7 @@ function MemberSection({
           const isMemberOwner = uid === ownerId;
           const label = isMe
             ? myDisplayName
-            : `멤버 (${uid.slice(0, 4)})`;
+            : (memberNames[uid] ?? `멤버 (${uid.slice(0, 4)})`);
           return (
             <li
               key={uid}
@@ -313,10 +329,6 @@ function MemberSection({
           );
         })}
       </ul>
-      <p className="mt-3 text-[11px] text-muted">
-        타 멤버 이름은 현재 uid prefix로 표시됩니다. 향후 그룹 doc에
-        memberNames 캐시 도입 예정.
-      </p>
     </Card>
   );
 }
@@ -350,7 +362,11 @@ function LeaveSection({
       await leaveGroup(groupId, myUid, isOwner);
       onLeft();
     } catch (err) {
-      setError(err instanceof GroupError ? err.message : "탈퇴 실패.");
+      setError(
+        err instanceof GroupError
+          ? err.message
+          : mapFirestoreError(err, "탈퇴 실패."),
+      );
       setBusy(false);
     }
   }

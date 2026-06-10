@@ -33,7 +33,8 @@ export function useChores(): UseChoresResult {
         arr.sort((a, b) => {
           const aMs = a.createdAt?.toMillis?.() ?? 0;
           const bMs = b.createdAt?.toMillis?.() ?? 0;
-          return aMs - bMs;
+          if (aMs !== bMs) return aMs - bMs;
+          return a.name.localeCompare(b.name, "ko");
         });
         setChores(arr);
         setError(null);
