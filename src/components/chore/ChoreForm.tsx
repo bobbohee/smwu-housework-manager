@@ -6,6 +6,8 @@ import Link from "next/link";
 import {
   COLOR_PALETTE,
   ChoreError,
+  DEFAULT_EMOJI,
+  EMOJI_PALETTE,
   createChore,
   updateChore,
   type PaletteColor,
@@ -40,6 +42,7 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [mode, setMode] = useState<ChoreMode>(initial?.mode ?? "rotation");
   const [color, setColor] = useState<string>(initial?.color ?? COLOR_PALETTE[0]);
+  const [emoji, setEmoji] = useState<string>(initial?.emoji ?? DEFAULT_EMOJI);
   const [rotationOrder, setRotationOrder] = useState<string[]>(
     initial?.rotationOrder ?? [],
   );
@@ -64,6 +67,7 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
         await updateChore(initial.id, {
           name,
           color,
+          emoji,
           rotationOrder: mode === "rotation" ? rotationOrder : [],
           allowProxyComplete,
           fixedSchedule: mode === "fixed" ? fixedSchedule : [],
@@ -75,6 +79,7 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
           name,
           mode,
           color,
+          emoji,
           rotationOrder: mode === "rotation" ? rotationOrder : [],
           allowProxyComplete,
           fixedSchedule: mode === "fixed" ? fixedSchedule : [],
@@ -104,6 +109,10 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
           maxLength={30}
           className="input"
         />
+      </Field>
+
+      <Field label="아이콘">
+        <EmojiPicker value={emoji} onChange={setEmoji} />
       </Field>
 
       <Field label="색상">
@@ -262,6 +271,38 @@ function ColorPicker({
             ].join(" ")}
             style={{ backgroundColor: c }}
           />
+        );
+      })}
+    </div>
+  );
+}
+
+function EmojiPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (e: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {EMOJI_PALETTE.map((e) => {
+        const selected = value === e;
+        return (
+          <button
+            key={e}
+            type="button"
+            onClick={() => onChange(e)}
+            aria-label={`아이콘 ${e}`}
+            className={[
+              "flex h-9 w-9 items-center justify-center rounded-lg border text-lg transition",
+              selected
+                ? "border-brand bg-brand/10 ring-2 ring-brand/30"
+                : "border-border bg-surface hover:bg-background",
+            ].join(" ")}
+          >
+            {e}
+          </button>
         );
       })}
     </div>

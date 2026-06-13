@@ -6,6 +6,7 @@ import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
 import { useChoreLog } from "@/lib/hooks/useChoreLog";
 import { LogDetailDialog } from "@/components/chore/LogDetailDialog";
+import { resolveChoreEmoji } from "@/lib/chore/operations";
 import type { ChoreDoc, ChoreLogDoc } from "@/lib/types/firestore";
 
 const WEEKDAY_HEADERS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -260,10 +261,9 @@ function LogRow({
         onClick={onClick}
         className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-border bg-surface-2 px-3 py-2.5 opacity-75"
       >
-        <span
-          className="h-2 w-2 shrink-0 rounded-full bg-dim"
-          aria-hidden
-        />
+        <span className="text-sm leading-none opacity-50" aria-hidden>
+          {chore ? resolveChoreEmoji(chore) : "📋"}
+        </span>
         <span className="flex-1 text-sm">
           <span className="font-semibold text-dim line-through">
             {chore?.name ?? "(삭제된 집안일)"}
@@ -284,11 +284,9 @@ function LogRow({
         borderColor: hexAlpha(color, 35),
       }}
     >
-      <span
-        className="h-2 w-2 shrink-0 rounded-full"
-        style={{ backgroundColor: color }}
-        aria-hidden
-      />
+      <span className="text-sm leading-none" aria-hidden>
+        {chore ? resolveChoreEmoji(chore) : "📋"}
+      </span>
       <span className="flex-1 text-sm">
         <span className="font-semibold text-foreground">
           {chore?.name ?? "(삭제된 집안일)"}

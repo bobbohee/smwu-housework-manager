@@ -38,6 +38,7 @@ export interface ChoreDoc {
   name: string;
   mode: ChoreMode;
   color: string;
+  emoji?: string;
   rotationOrder: string[];
   currentTurnIndex: number;
   allowProxyComplete: boolean;

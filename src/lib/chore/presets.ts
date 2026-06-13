@@ -15,6 +15,7 @@ export interface ChorePreset {
   name: string;
   mode: ChoreMode;
   defaultColor: PaletteColor;
+  defaultEmoji: string;
   defaultRules?: string[];
 }
 
@@ -25,6 +26,7 @@ export const CHORE_PRESETS: readonly ChorePreset[] = [
     name: "설거지",
     mode: "rotation",
     defaultColor: COLOR_PALETTE[0], // 블루
+    defaultEmoji: "🍽️",
     defaultRules: ["음식물쓰레기 비우기", "싱크대 물기 닦기"],
   },
   {
@@ -32,24 +34,28 @@ export const CHORE_PRESETS: readonly ChorePreset[] = [
     name: "빨래",
     mode: "rotation",
     defaultColor: COLOR_PALETTE[2], // 그린
+    defaultEmoji: "👕",
   },
   {
     slug: "living-room",
     name: "거실 청소",
     mode: "rotation",
     defaultColor: COLOR_PALETTE[3], // 오렌지
+    defaultEmoji: "🛋️",
   },
   {
     slug: "room",
     name: "방 청소",
     mode: "rotation",
     defaultColor: COLOR_PALETTE[4], // 퍼플
+    defaultEmoji: "🛏️",
   },
   {
     slug: "cooking",
     name: "밥하기",
     mode: "rotation",
     defaultColor: COLOR_PALETTE[9], // 옐로우
+    defaultEmoji: "🍚",
   },
   // 고정제 (스케줄은 그룹이 직접 지정)
   {
@@ -57,18 +63,21 @@ export const CHORE_PRESETS: readonly ChorePreset[] = [
     name: "음식물쓰레기 비우기",
     mode: "fixed",
     defaultColor: COLOR_PALETTE[5], // 틸
+    defaultEmoji: "🗑️",
   },
   {
     slug: "trash",
     name: "일반쓰레기 배출",
     mode: "fixed",
     defaultColor: COLOR_PALETTE[7], // 네이비
+    defaultEmoji: "🗑️",
   },
   {
     slug: "bathroom",
     name: "화장실 청소",
     mode: "fixed",
     defaultColor: COLOR_PALETTE[1], // 레드
+    defaultEmoji: "🚽",
   },
 ] as const;
 
@@ -106,6 +115,7 @@ export async function createChoresFromPresets(
       name: preset.name,
       mode: preset.mode,
       color: preset.defaultColor,
+      emoji: preset.defaultEmoji,
       rotationOrder: [],
       currentTurnIndex: 0,
       allowProxyComplete: false,

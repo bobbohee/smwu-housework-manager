@@ -1,4 +1,5 @@
 import type { ChoreDoc, ChoreLogDoc } from "@/lib/types/firestore";
+import { resolveChoreEmoji } from "@/lib/chore/operations";
 
 export interface MemberStat {
   uid: string;
@@ -9,6 +10,7 @@ export interface ChoreStat {
   choreId: string;
   name: string;
   color: string;
+  emoji?: string;
   count: number;
   percent: number;
 }
@@ -59,6 +61,7 @@ export function aggregateByChore(
         choreId: c.id,
         name: c.name,
         color: c.color,
+        emoji: resolveChoreEmoji(c),
         count,
         percent,
       };

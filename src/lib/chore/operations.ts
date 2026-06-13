@@ -40,6 +40,49 @@ export const COLOR_PALETTE = [
 
 export type PaletteColor = (typeof COLOR_PALETTE)[number];
 
+export const EMOJI_PALETTE = [
+  "🍽️",
+  "👕",
+  "🧹",
+  "🍚",
+  "🗑️",
+  "🛁",
+  "🛋️",
+  "🛏️",
+  "🚽",
+  "🧺",
+  "🧽",
+  "🚿",
+  "🪴",
+  "🐶",
+  "📦",
+  "✨",
+] as const;
+
+export const DEFAULT_EMOJI = "📋";
+
+const NAME_EMOJI_RULES: Array<{ re: RegExp; emoji: string }> = [
+  { re: /설거지|식기|싱크/i, emoji: "🍽️" },
+  { re: /빨래|세탁/i, emoji: "👕" },
+  { re: /거실/i, emoji: "🛋️" },
+  { re: /방.*청소|침실/i, emoji: "🛏️" },
+  { re: /밥|요리|식사/i, emoji: "🍚" },
+  { re: /쓰레기|재활용/i, emoji: "🗑️" },
+  { re: /화장실|욕실|변기|샤워/i, emoji: "🚽" },
+  { re: /청소/i, emoji: "🧹" },
+];
+
+export function resolveChoreEmoji(chore: {
+  emoji?: string;
+  name: string;
+}): string {
+  if (chore.emoji) return chore.emoji;
+  for (const { re, emoji } of NAME_EMOJI_RULES) {
+    if (re.test(chore.name)) return emoji;
+  }
+  return DEFAULT_EMOJI;
+}
+
 export class ChoreError extends Error {}
 
 const MAX_NAME_LENGTH = 30;
@@ -75,6 +118,7 @@ export interface CreateChoreInput {
   name: string;
   mode: ChoreMode;
   color: string;
+  emoji?: string;
   rotationOrder?: string[];
   allowProxyComplete?: boolean;
   fixedSchedule?: FixedScheduleEntry[];
@@ -96,6 +140,7 @@ export async function createChore(input: CreateChoreInput): Promise<string> {
     name,
     mode: input.mode,
     color: input.color,
+    emoji: input.emoji ?? DEFAULT_EMOJI,
     rotationOrder: input.rotationOrder ?? [],
     currentTurnIndex: 0,
     allowProxyComplete: input.allowProxyComplete ?? false,
@@ -112,6 +157,7 @@ export type UpdateChorePatch = Partial<
     ChoreDoc,
     | "name"
     | "color"
+    | "emoji"
     | "rotationOrder"
     | "allowProxyComplete"
     | "fixedSchedule"

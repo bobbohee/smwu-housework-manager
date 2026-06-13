@@ -5,7 +5,11 @@ import { useState } from "react";
 import { GroupBar } from "@/components/group/GroupBar";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
-import { ChoreError, deleteChore } from "@/lib/chore/operations";
+import {
+  ChoreError,
+  deleteChore,
+  resolveChoreEmoji,
+} from "@/lib/chore/operations";
 import { mapFirestoreError } from "@/lib/firebase/errors";
 import type { ChoreDoc } from "@/lib/types/firestore";
 
@@ -114,7 +118,12 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
         aria-hidden
       />
       <Link href={`/chores/${chore.id}`} className="flex-1 min-w-0">
-        <p className="truncate text-sm font-bold text-foreground">{chore.name}</p>
+        <p className="flex items-center gap-1.5 truncate text-sm font-bold text-foreground">
+          <span className="text-base leading-none" aria-hidden>
+            {resolveChoreEmoji(chore)}
+          </span>
+          {chore.name}
+        </p>
         <p className="mt-0.5 text-[11px] text-muted">
           {chore.mode === "rotation"
             ? `순번제 · 참여 ${chore.rotationOrder.length}명`

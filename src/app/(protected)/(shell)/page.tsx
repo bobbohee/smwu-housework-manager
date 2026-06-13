@@ -9,7 +9,11 @@ import { useChores } from "@/lib/hooks/useChores";
 import { signOut } from "@/lib/firebase/auth";
 import { mapAuthError, mapFirestoreError } from "@/lib/firebase/errors";
 import { GroupBar } from "@/components/group/GroupBar";
-import { ChoreError, completeRotation } from "@/lib/chore/operations";
+import {
+  ChoreError,
+  completeRotation,
+  resolveChoreEmoji,
+} from "@/lib/chore/operations";
 import { dutyUidsForToday } from "@/lib/chore/fixed-schedule";
 import type { ChoreDoc, GroupDoc } from "@/lib/types/firestore";
 
@@ -185,11 +189,9 @@ function FixedDutySection({
       <ul className="mt-1.5 space-y-1">
         {items.map(({ chore, dutyUids }) => (
           <li key={chore.id} className="flex items-center gap-2 text-sm">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full"
-              style={{ backgroundColor: chore.color }}
-              aria-hidden
-            />
+            <span className="text-base leading-none" aria-hidden>
+              {resolveChoreEmoji(chore)}
+            </span>
             <span className="font-medium text-foreground">{chore.name}</span>
             <span className="text-muted">—</span>
             <span className="font-semibold text-foreground">
@@ -290,6 +292,9 @@ function RotationCard({
         borderColor: hexAlpha(chore.color, 35),
       }}
     >
+      <span className="text-2xl leading-none" aria-hidden>
+        {resolveChoreEmoji(chore)}
+      </span>
       <p
         className="text-sm font-bold leading-tight"
         style={{ color: chore.color }}
