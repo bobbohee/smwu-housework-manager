@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 프로젝트 상태
 
-**구현 진행 중** — 1주차(인프라·인증·그룹) + 2주차(집안일 핵심·캘린더) 완료. 3주차(통계·꽝뽑기·배포) 진행 예정.
+**개발 완료** — 1·2·3주차 코드 작업 끝. 운영 잔여 = Vercel 배포 + 발표 자료(사용자 작업).
 
 2주차 산출물 요약:
 - 집안일 CRUD + 8개 프리셋 + 그룹 생성 시 선택 UI
@@ -15,6 +15,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `lib/chore/rotation.ts`·`fixed-schedule.ts` pure 함수 분리 + 단위 테스트 40개
 - 와이어프레임 시각 동기화 (색상 토큰·홈 카드·캘린더·다이얼로그·집안일 카드)
 - `groups.memberNames` 캐시 (다른 멤버 이름 노출 영구 해결)
+
+3주차 산출물 요약:
+- 통계 페이지 — 월 네비 + 멤버 세로 바 + 표 + 집안일 가로 progress bar (외부 차트 lib 0개, div+CSS만)
+- 꽝뽑기 페이지 — 참여 멤버 체크 + 당첨 인원 stepper + 즉시 reveal (chore 무관 일회성, choreLog 미기록)
+- `lib/chore/stats.ts`·`random.ts` pure 함수 분리 + 단위 테스트 20개 (누적 101개)
+- `mapFirestoreError` — permission-denied 등 Firestore 코드 한글 매핑, 10개 catch site 적용
+- settings memberNames 캐시 활성화 (uid prefix fallback)
+- 집안일 정렬 안정화 (createdAt + name localeCompare ko tie-break)
+- 모바일 반응형 sweep (375×812) — sm/md/lg 전 페이지 fit
+- ChoreLogType `random` + 관련 dead code 정리 (절대 생성되지 않는 분기 제거)
 
 설계 산출물:
 - `docs/superpowers/specs/2026-03-31-house-chore-manager-design.md` — **단일 진실 공급원(SSOT)**. 기능·데이터 모델·페이지 구성 정의.
@@ -63,9 +73,9 @@ npm run emulators        # auth + firestore 에뮬레이터 수동 기동
 
 1. **순번 진행**: 순번제 chore 완료 시 `choreLog`에 기록 + `currentTurnIndex = (currentTurnIndex + 1) % rotationOrder.length`. 완료 버튼 1회 = 차례 1회 소진.
 1-1. **완료 권한 & 귀속 분리**: 기본은 현재 차례 멤버만 완료 버튼 활성. `allowProxyComplete: true`면 참여 멤버 누구나 대신 완료. choreLog는 `completedBy`(차례·통계 귀속)와 `completedByActual`(실제 누른 사람)을 분리 기록 — 통계는 `completedBy` 기준.
-2. **완료 내역 비활성화 → 차례 복원**: 방장이 `choreLog` 항목을 비활성화(`active: false`)하면, 그 항목이 순번제(`type: "rotation"`)인 경우 **`currentTurnIndex`를 되돌려야** 한다(차례 복원). 비활성화는 사유(`deactivateReason`) 입력 필수, 레코드는 삭제하지 않고 보존.
+2. **완료 내역 비활성화 → 차례 복원**: 방장이 `choreLog` 항목을 비활성화(`active: false`)하면, 해당 chore가 순번제(`chore.mode === "rotation"`)인 경우 **`currentTurnIndex`를 되돌려야** 한다(차례 복원). 비활성화는 사유(`deactivateReason`) 입력 필수, 레코드는 삭제하지 않고 보존.
 3. **통계 집계는 `active: true`만**: 멤버별/집안일별 완료 횟수는 비활성화 항목을 제외. 단 **캘린더 뷰는 비활성화 항목도 표시**하되 구분 가능하게.
-4. **꽝뽑기 결과**: 랜덤 배정 결과는 `choreLog`에 `type: "random"`으로 기록(순번제 완료와 구분).
+4. **꽝뽑기 결과는 기록하지 않음**: 추첨은 chore 무관 일회성. choreLog 미생성, 통계·캘린더 미반영. 페이지 상태만 휘발.
 5. **완료 규칙(`chores.rules`)**: 참고용 표시일 뿐, 앱이 강제 체크하지 않는다.
 6. **권한**: 방장(owner)만 멤버 강퇴 / 완료 내역 비활성화 / 방장 위임 가능.
 
@@ -88,12 +98,14 @@ npm run emulators        # auth + firestore 에뮬레이터 수동 기동
 | `src/lib/firebase/auth.ts` | signUp/signIn/signOut 래퍼 + users doc 생성 |
 | `src/lib/firebase/converters.ts` | 5개 컬렉션 FirestoreDataConverter |
 | `src/lib/firebase/collections.ts` | 타입 안전 ref helper |
-| `src/lib/firebase/errors.ts` | Auth 에러 코드 한국어 매핑 |
+| `src/lib/firebase/errors.ts` | Auth + Firestore 에러 코드 한국어 매핑 (`mapAuthError`·`mapFirestoreError`) |
 | `src/lib/group/invite-code.ts` | 6자 코드 생성·검증 (혼동문자 제외) |
 | `src/lib/group/operations.ts` | createGroup/joinGroup/updateName/transfer/kick/leave + memberNames sync |
-| `src/lib/chore/operations.ts` | CRUD + completeRotation/recordRandomDraw/deactivateChoreLog + COLOR_PALETTE |
+| `src/lib/chore/operations.ts` | CRUD + completeRotation/deactivateChoreLog + COLOR_PALETTE |
 | `src/lib/chore/rotation.ts` | nextTurnIndex·restoreTurnIndex·checkCompletionPermission (pure) |
 | `src/lib/chore/fixed-schedule.ts` | isOnDutyToday·dutyUidsForToday (weekly/interval pure) |
+| `src/lib/chore/stats.ts` | aggregateByMember·aggregateByChore (월별 집계 pure) |
+| `src/lib/chore/random.ts` | drawWinners (Fisher–Yates 셔플 pure) |
 | `src/lib/chore/presets.ts` | 8개 프리셋 + createChoresFromPresets batch |
 | `src/lib/providers/AuthProvider.tsx` | onAuthStateChanged 구독 |
 | `src/lib/providers/ActiveGroupProvider.tsx` | 활성 그룹 + stale 자가 정리 (derived selection) |
@@ -102,6 +114,8 @@ npm run emulators        # auth + firestore 에뮬레이터 수동 기동
 | `src/components/group/GroupBar·GroupSwitcher` | 그룹 전환 UI |
 | `src/components/chore/ChoreForm.tsx` | 추가/편집 공통 폼 (이름·색상·모드·참여멤버·스케줄·규칙) |
 | `src/components/chore/LogDetailDialog.tsx` | 캘린더 셀 상세 + 방장 비활성화 액션 |
+| `src/components/stats/MemberBarChart.tsx`·`ChoreBarChart.tsx` | 통계 div+CSS 차트 |
+| `src/components/random/RandomResultCard.tsx` | 꽝뽑기 결과 reveal 카드 |
 
 ## 클라이언트 책임 (Rules가 안 막는 검증)
 
