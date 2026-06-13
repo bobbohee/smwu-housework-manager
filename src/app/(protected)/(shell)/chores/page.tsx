@@ -108,8 +108,8 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
     <li
       className="flex items-center gap-3 rounded-xl border px-3 py-3"
       style={{
-        backgroundColor: hexAlpha(chore.color, 10),
-        borderColor: hexAlpha(chore.color, 35),
+        backgroundColor: hexAlpha(chore.color, 22),
+        borderColor: hexAlpha(chore.color, 70),
       }}
     >
       <span

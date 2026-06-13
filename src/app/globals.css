@@ -1,28 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  /* 와이어프레임(docs/superpowers/wireframes/wireframe-interactive.html) 팔레트와 동기화 */
-  --color-background: #eef1f6;
+  /* 베이스 토큰 — 와이어프레임 기반에서 채도·명도 살짝 올려 깨끗한 인상 */
+  --color-background: #f6f8fc;
   --color-surface: #ffffff;
-  --color-surface-2: #f4f6fa;
-  --color-foreground: #1f2733;
-  --color-muted: #6b7280;
-  --color-border: #e2e7ef;
-  --color-dim: #9aa3af;
+  --color-surface-2: #f1f4fa;
+  --color-foreground: #0f172a;
+  --color-muted: #475569;
+  --color-border: #dde3ec;
+  --color-dim: #94a3b8;
 
-  --color-brand: #2f6fdb;
+  --color-brand: #2563eb;
   --color-brand-foreground: #ffffff;
 
-  --color-chore-blue: #4a90d9;
-  --color-chore-red: #e74c3c;
-  --color-chore-green: #2ecc71;
-  --color-chore-orange: #f39c12;
-  --color-chore-purple: #9b59b6;
-  --color-chore-teal: #1abc9c;
-  --color-chore-pink: #e91e8c;
-  --color-chore-navy: #34495e;
-  --color-chore-gray: #95a5a6;
-  --color-chore-yellow: #f1c40f;
+  /* Chore 팔레트 — Tailwind 500계열 위주로 채도 향상 (탁함 제거) */
+  --color-chore-blue: #3b82f6;
+  --color-chore-red: #ef4444;
+  --color-chore-green: #10b981;
+  --color-chore-orange: #f59e0b;
+  --color-chore-purple: #a855f7;
+  --color-chore-teal: #14b8a6;
+  --color-chore-pink: #ec4899;
+  --color-chore-navy: #475569;
+  --color-chore-gray: #94a3b8;
+  --color-chore-yellow: #eab308;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

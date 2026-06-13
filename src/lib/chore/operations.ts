@@ -26,6 +26,20 @@ import {
 } from "@/lib/chore/rotation";
 
 export const COLOR_PALETTE = [
+  "#3B82F6", // blue
+  "#EF4444", // red
+  "#10B981", // green
+  "#F59E0B", // amber
+  "#A855F7", // purple
+  "#14B8A6", // teal
+  "#EC4899", // pink
+  "#475569", // slate
+  "#94A3B8", // slate-light
+  "#EAB308", // yellow
+] as const;
+
+// 기존 chore에 저장된 v1 팔레트(채도 낮은 색상). 표시·편집 호환성을 위해 valid로 인정.
+const LEGACY_PALETTE = [
   "#4A90D9",
   "#E74C3C",
   "#2ECC71",
@@ -37,6 +51,21 @@ export const COLOR_PALETTE = [
   "#95A5A6",
   "#F1C40F",
 ] as const;
+
+// 기존 chore.color(legacy hex)를 새 vivid 팔레트로 표시 시점 매핑.
+// 데이터 마이그레이션 없이 일관된 시각 유지.
+const LEGACY_TO_VIVID: Record<string, string> = LEGACY_PALETTE.reduce(
+  (acc, legacy, i) => {
+    acc[legacy.toUpperCase()] = COLOR_PALETTE[i];
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+export function resolveChoreColor(color: string | undefined): string {
+  if (!color) return COLOR_PALETTE[0];
+  return LEGACY_TO_VIVID[color.toUpperCase()] ?? color;
+}
 
 export type PaletteColor = (typeof COLOR_PALETTE)[number];
 
@@ -89,7 +118,10 @@ const MAX_NAME_LENGTH = 30;
 const MAX_REASON_LENGTH = 200;
 
 function isPaletteColor(color: string): color is PaletteColor {
-  return (COLOR_PALETTE as readonly string[]).includes(color);
+  return (
+    (COLOR_PALETTE as readonly string[]).includes(color) ||
+    (LEGACY_PALETTE as readonly string[]).includes(color)
+  );
 }
 
 function normalizeName(raw: string): string {

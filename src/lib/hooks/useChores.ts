@@ -5,6 +5,7 @@ import { onSnapshot, query, where } from "firebase/firestore";
 import { choresCol } from "@/lib/firebase/collections";
 import type { ChoreDoc } from "@/lib/types/firestore";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
+import { resolveChoreColor } from "@/lib/chore/operations";
 
 export interface UseChoresResult {
   chores: ChoreDoc[];
@@ -29,7 +30,11 @@ export function useChores(): UseChoresResult {
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const arr = snap.docs.map((d) => d.data());
+        const arr = snap.docs.map((d) => {
+          const data = d.data();
+          // legacy color → vivid 자동 매핑 (저장값은 보존, view에만 영향)
+          return { ...data, color: resolveChoreColor(data.color) };
+        });
         arr.sort((a, b) => {
           const aMs = a.createdAt?.toMillis?.() ?? 0;
           const bMs = b.createdAt?.toMillis?.() ?? 0;

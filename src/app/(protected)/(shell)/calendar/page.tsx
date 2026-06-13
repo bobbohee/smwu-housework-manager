@@ -280,8 +280,8 @@ function LogRow({
       onClick={onClick}
       className="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5"
       style={{
-        backgroundColor: hexAlpha(color, 10),
-        borderColor: hexAlpha(color, 35),
+        backgroundColor: hexAlpha(color, 22),
+        borderColor: hexAlpha(color, 70),
       }}
     >
       <span className="text-sm leading-none" aria-hidden>

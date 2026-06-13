@@ -288,8 +288,8 @@ function RotationCard({
     <li
       className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-3 text-center"
       style={{
-        backgroundColor: hexAlpha(chore.color, 10),
-        borderColor: hexAlpha(chore.color, 35),
+        backgroundColor: hexAlpha(chore.color, 22),
+        borderColor: hexAlpha(chore.color, 70),
       }}
     >
       <span className="text-2xl leading-none" aria-hidden>
