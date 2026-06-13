@@ -113,7 +113,6 @@ function LogDetail({
         minute: "2-digit",
       })
     : "";
-  const typeLabel = log.type === "random" ? "꽝뽑기" : "순번제";
   const proxy = log.completedByActual !== log.completedBy;
   const color = chore?.color ?? "#95A5A6";
 
@@ -152,11 +151,6 @@ function LogDetail({
       <Row label="완료 시간">
         <span className={log.active ? "font-semibold text-foreground" : "font-semibold text-dim"}>
           {time}
-        </span>
-      </Row>
-      <Row label="유형">
-        <span className={log.active ? "font-semibold text-foreground" : "font-semibold text-dim"}>
-          {typeLabel}
         </span>
       </Row>
       <Row label="상태">

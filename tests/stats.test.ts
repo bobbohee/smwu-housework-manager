@@ -15,7 +15,6 @@ function log(
     completedBy: partial.completedBy,
     completedByActual: partial.completedByActual ?? partial.completedBy,
     completedAt: partial.completedAt ?? ({} as ChoreLogDoc["completedAt"]),
-    type: partial.type ?? "rotation",
     active: partial.active ?? true,
   };
 }

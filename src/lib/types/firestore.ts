@@ -46,8 +46,6 @@ export interface ChoreDoc {
   createdAt: Timestamp;
 }
 
-export type ChoreLogType = "rotation" | "random";
-
 export interface ChoreLogDoc {
   id: string;
   choreId: string;
@@ -55,7 +53,6 @@ export interface ChoreLogDoc {
   completedBy: string;
   completedByActual: string;
   completedAt: Timestamp;
-  type: ChoreLogType;
   active: boolean;
   deactivateReason?: string;
   deactivatedBy?: string;

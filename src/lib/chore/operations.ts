@@ -187,7 +187,6 @@ export async function completeRotation(
     completedBy: turnUid,
     completedByActual: input.actualUid,
     completedAt: serverTimestamp() as unknown as ChoreDoc["createdAt"],
-    type: "rotation",
     active: true,
   });
   batch.update(choreRef(input.choreId), {
@@ -237,19 +236,17 @@ export async function deactivateChoreLog(
     deactivatedAt: serverTimestamp() as unknown as ChoreDoc["createdAt"],
   });
 
-  // 순번제 비활성화 → currentTurnIndex 1칸 복원.
+  // 순번제 chore 비활성화 → currentTurnIndex 1칸 복원.
   // 주의: 과거 어떤 log를 비활성화해도 -1. UI에서 가장 최근 항목 한정 권장.
-  if (log.type === "rotation") {
-    const choreSnap = await getDoc(choreRef(log.choreId));
-    if (choreSnap.exists()) {
-      const chore = choreSnap.data();
-      if (chore.mode === "rotation" && chore.rotationOrder.length > 0) {
-        const restored = restoreTurnIndex(
-          chore.currentTurnIndex,
-          chore.rotationOrder.length,
-        );
-        batch.update(choreRef(log.choreId), { currentTurnIndex: restored });
-      }
+  const choreSnap = await getDoc(choreRef(log.choreId));
+  if (choreSnap.exists()) {
+    const chore = choreSnap.data();
+    if (chore.mode === "rotation" && chore.rotationOrder.length > 0) {
+      const restored = restoreTurnIndex(
+        chore.currentTurnIndex,
+        chore.rotationOrder.length,
+      );
+      batch.update(choreRef(log.choreId), { currentTurnIndex: restored });
     }
   }
 
