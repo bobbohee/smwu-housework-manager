@@ -202,34 +202,6 @@ export async function completeRotation(
   };
 }
 
-export interface RecordRandomDrawInput {
-  choreId: string;
-  groupId: string;
-  winnerUid: string;
-  actualUid: string;
-}
-
-export async function recordRandomDraw(
-  input: RecordRandomDrawInput,
-): Promise<string> {
-  if (!input.choreId) throw new ChoreError("집안일 정보가 올바르지 않습니다.");
-  if (!input.groupId) throw new ChoreError("그룹 정보가 올바르지 않습니다.");
-  if (!input.winnerUid) throw new ChoreError("당첨자 정보가 올바르지 않습니다.");
-
-  const newLogRef = doc(choreLogCol());
-  await setDoc(newLogRef, {
-    id: newLogRef.id,
-    choreId: input.choreId,
-    groupId: input.groupId,
-    completedBy: input.winnerUid,
-    completedByActual: input.actualUid,
-    completedAt: serverTimestamp() as unknown as ChoreDoc["createdAt"],
-    type: "random",
-    active: true,
-  });
-  return newLogRef.id;
-}
-
 export interface DeactivateChoreLogInput {
   logId: string;
   ownerUid: string;
