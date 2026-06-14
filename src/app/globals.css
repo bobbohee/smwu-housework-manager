@@ -45,8 +45,7 @@ body {
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-sans), "Apple SD Gothic Neo", "Pretendard",
-    "Noto Sans KR", system-ui, sans-serif;
+  font-family: var(--font-sans), "Noto Sans KR", system-ui, sans-serif;
 }
 
 @layer components {
