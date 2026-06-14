@@ -112,10 +112,7 @@ export default function CalendarPage() {
                     logs={cellLogs}
                     choreById={choreById}
                     selected={cell.iso === selectedDate}
-                    onClick={() => {
-                      setSelectedDate(cell.iso);
-                      setDialogDate(cell.iso);
-                    }}
+                    onClick={() => setSelectedDate(cell.iso)}
                   />
                 );
               })}
