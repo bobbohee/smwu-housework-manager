@@ -90,7 +90,7 @@ export default function CalendarPage() {
                 <div
                   key={label}
                   className={[
-                    "text-[11px] font-semibold",
+                    "text-sm font-semibold",
                     i === 0 && "text-chore-red",
                     i === 6 && "text-brand",
                     i !== 0 && i !== 6 && "text-muted",
@@ -120,7 +120,7 @@ export default function CalendarPage() {
 
             {/* 선택한 날짜의 완료 기록 리스트 */}
             <div className="border-t border-border px-1 pt-3">
-              <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wide text-muted">
+              <p className="mb-2.5 text-sm font-bold uppercase tracking-wide text-muted">
                 {formatHumanDate(selectedDate)} 완료 기록
               </p>
               {selectedLogs.length === 0 ? (
@@ -192,7 +192,7 @@ function DayCell({
     >
       <span
         className={[
-          "text-[11px] font-semibold",
+          "text-sm font-semibold",
           cell.isToday
             ? "rounded-full bg-brand px-1.5 py-0.5 text-brand-foreground"
             : selected
@@ -267,7 +267,7 @@ function LogRow({
           </span>
           <span className="text-dim"> : {nameOf(log.completedBy)}</span>
         </span>
-        <span className="text-[10px] font-semibold text-chore-red">비활성화</span>
+        <span className="text-sm font-semibold text-chore-red">비활성화</span>
       </li>
     );
   }
@@ -292,7 +292,7 @@ function LogRow({
         </span>
         <span className="text-muted"> : {nameOf(log.completedBy)}</span>
       </span>
-      <span className="text-[10px] text-muted">{time}</span>
+      <span className="text-sm text-muted">{time}</span>
     </li>
   );
 }

@@ -313,7 +313,7 @@ function MemberSection({
                   <p className="text-sm font-medium text-foreground">
                     {label} {isMe && <span className="text-xs text-muted">(나)</span>}
                   </p>
-                  <p className="text-[11px] text-muted">
+                  <p className="text-sm text-muted">
                     {isMemberOwner ? "방장" : "멤버"}
                   </p>
                 </div>
@@ -324,14 +324,14 @@ function MemberSection({
                   <button
                     onClick={() => onTransfer(uid)}
                     disabled={busy}
-                    className="rounded-md border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-background disabled:opacity-50"
+                    className="rounded-md border border-border bg-surface px-2.5 py-1 text-sm font-medium text-foreground hover:bg-background disabled:opacity-50"
                   >
                     방장 위임
                   </button>
                   <button
                     onClick={() => onKick(uid)}
                     disabled={busy}
-                    className="rounded-md border border-chore-red bg-chore-red/10 px-2.5 py-1 text-[11px] font-medium text-chore-red hover:bg-chore-red/20 disabled:opacity-50"
+                    className="rounded-md border border-chore-red bg-chore-red/10 px-2.5 py-1 text-sm font-medium text-chore-red hover:bg-chore-red/20 disabled:opacity-50"
                   >
                     강퇴
                   </button>

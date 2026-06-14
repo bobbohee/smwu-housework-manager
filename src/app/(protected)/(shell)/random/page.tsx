@@ -139,7 +139,7 @@ function RandomDraw({ group }: { group: GroupDoc }) {
             +
           </button>
         </div>
-        <p className="mt-1.5 text-center text-[11px] text-muted">
+        <p className="mt-1.5 text-center text-sm text-muted">
           {selectedCount}명 중 {clampedCount}명 당첨
         </p>
       </section>

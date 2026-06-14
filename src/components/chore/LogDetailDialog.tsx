@@ -169,7 +169,7 @@ function LogDetail({
             </Row>
           )}
           <div className="rounded-lg border border-chore-red/25 bg-chore-red/5 px-3 py-2">
-            <p className="mb-0.5 text-[11px] font-semibold text-chore-red">
+            <p className="mb-0.5 text-sm font-semibold text-chore-red">
               비활성화 사유
             </p>
             <p className="text-xs text-foreground">
@@ -239,7 +239,7 @@ function DeactivateButton({ logId, ownerUid }: { logId: string; ownerUid: string
 
   return (
     <div className="space-y-2 rounded-lg bg-surface-2 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+      <p className="text-sm font-semibold uppercase tracking-wide text-muted">
         비활성화 사유 (필수)
       </p>
       <textarea

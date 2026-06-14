@@ -16,7 +16,7 @@ export function BottomTabs() {
             key={item.href}
             href={item.href}
             className={[
-              "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition",
+              "flex flex-col items-center gap-0.5 py-2 text-sm font-medium transition",
               active ? "text-brand" : "text-muted",
             ].join(" ")}
           >

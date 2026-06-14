@@ -38,13 +38,13 @@ export function RandomResultCard({
                 <span className="text-3xl">{isWinner ? "💣" : "😌"}</span>
               </div>
               <div
-                className="text-[13px]"
+                className="text-sm"
                 style={{ color: isWinner ? PINK : "var(--muted)" }}
               >
                 <span className={isWinner ? "font-bold" : ""}>{name}</span>
               </div>
               <div
-                className="text-[11px]"
+                className="text-sm"
                 style={{ color: isWinner ? PINK : "var(--muted)" }}
               >
                 <span className={isWinner ? "font-semibold" : ""}>

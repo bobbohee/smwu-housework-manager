@@ -59,7 +59,7 @@ export function GroupSwitcher({
                 >
                   <span>{g.name}</span>
                   {isCurrent && (
-                    <span className="rounded-md bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-brand-foreground">
+                    <span className="rounded-md bg-brand px-1.5 py-0.5 text-sm font-semibold text-brand-foreground">
                       현재
                     </span>
                   )}

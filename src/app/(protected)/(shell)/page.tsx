@@ -179,7 +179,7 @@ function FixedDutySection({
 
   return (
     <section className="rounded-lg border border-chore-green/35 bg-chore-green/10 px-3 py-2.5">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-chore-green">
+      <p className="text-sm font-bold uppercase tracking-wide text-chore-green">
         오늘의 고정 집안일
       </p>
       <ul className="mt-1.5 space-y-1">
@@ -222,7 +222,7 @@ function RotationSection({
 
   return (
     <section>
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+      <p className="text-sm font-bold uppercase tracking-wide text-muted">
         순번제 집안일
       </p>
       <ul className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -300,7 +300,7 @@ function RotationCard({
         <p className="text-lg font-bold leading-tight text-foreground">
           {memberName(group, turnUid)}
           {isMyTurn && (
-            <span className="ml-1 text-[11px] font-semibold text-brand">
+            <span className="ml-1 text-sm font-semibold text-brand">
               (나)
             </span>
           )}
@@ -319,10 +319,10 @@ function RotationCard({
         {submitting ? "처리 중…" : "완료"}
       </button>
       {chore.allowProxyComplete && (
-        <span className="text-[10px] text-muted">대신 완료 허용</span>
+        <span className="text-sm text-muted">대신 완료 허용</span>
       )}
       {error && (
-        <p className="rounded bg-chore-red/10 px-1.5 py-0.5 text-[10px] text-chore-red">
+        <p className="rounded bg-chore-red/10 px-1.5 py-0.5 text-sm text-chore-red">
           {error}
         </p>
       )}

@@ -89,7 +89,7 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
       />
       <Link href={`/chores/${chore.id}`} className="flex-1 min-w-0">
         <p className="truncate text-sm font-bold text-foreground">{chore.name}</p>
-        <p className="mt-0.5 text-[11px] text-muted">
+        <p className="mt-0.5 text-sm text-muted">
           {chore.mode === "rotation"
             ? `순번제 · 참여 ${chore.rotationOrder.length}명`
             : `고정제 · 스케줄 ${chore.fixedSchedule.length}건`}

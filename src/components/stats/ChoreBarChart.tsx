@@ -15,7 +15,7 @@ export function ChoreBarChart({ stats }: ChoreBarChartProps) {
             key={s.choreId}
             className="flex items-center gap-2.5"
           >
-            <span className="flex w-20 shrink-0 items-center gap-1.5 truncate text-[12px] text-foreground">
+            <span className="flex w-20 shrink-0 items-center gap-1.5 truncate text-sm text-foreground">
               <span
                 className="h-2 w-2 shrink-0 rounded-full"
                 style={{ backgroundColor: s.color }}
@@ -32,7 +32,7 @@ export function ChoreBarChart({ stats }: ChoreBarChartProps) {
                 }}
               />
             </div>
-            <span className="w-7 text-right text-[11px] text-muted">
+            <span className="w-7 text-right text-sm text-muted">
               {s.count}
             </span>
           </div>
