@@ -15,10 +15,12 @@ export function ChoreBarChart({ stats }: ChoreBarChartProps) {
             key={s.choreId}
             className="flex items-center gap-2.5"
           >
-            <span className="flex w-20 shrink-0 items-center gap-1 truncate text-[12px] text-foreground">
-              <span className="text-sm leading-none" aria-hidden>
-                {s.emoji ?? "📋"}
-              </span>
+            <span className="flex w-20 shrink-0 items-center gap-1.5 truncate text-[12px] text-foreground">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: s.color }}
+                aria-hidden
+              />
               <span className="truncate">{s.name}</span>
             </span>
             <div className="flex-1 overflow-hidden rounded-md border border-border bg-surface">

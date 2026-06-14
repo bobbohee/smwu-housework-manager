@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ChoreError,
-  deactivateChoreLog,
-  resolveChoreEmoji,
-} from "@/lib/chore/operations";
+import { ChoreError, deactivateChoreLog } from "@/lib/chore/operations";
 import type { ChoreDoc, ChoreLogDoc, GroupDoc } from "@/lib/types/firestore";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { mapFirestoreError } from "@/lib/firebase/errors";
@@ -115,6 +111,7 @@ function LogDetail({
       })
     : "";
   const proxy = log.completedByActual !== log.completedBy;
+  const color = chore?.color ?? "#94A3B8";
 
   return (
     <li className="space-y-2.5">
@@ -125,9 +122,11 @@ function LogDetail({
             !log.active && "text-dim line-through",
           ].filter(Boolean).join(" ")}
         >
-          <span className="text-base leading-none" aria-hidden>
-            {chore ? resolveChoreEmoji(chore) : "📋"}
-          </span>
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: color }}
+            aria-hidden
+          />
           <span className={log.active ? "text-foreground" : "text-dim"}>
             {chore?.name ?? "(삭제된 집안일)"}
           </span>

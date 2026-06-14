@@ -6,8 +6,6 @@ import Link from "next/link";
 import {
   COLOR_PALETTE,
   ChoreError,
-  DEFAULT_EMOJI,
-  EMOJI_PALETTE,
   createChore,
   updateChore,
   type PaletteColor,
@@ -61,7 +59,6 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [mode, setMode] = useState<ChoreMode>(initial?.mode ?? "rotation");
   const [color, setColor] = useState<string>(initial?.color ?? COLOR_PALETTE[0]);
-  const [emoji, setEmoji] = useState<string>(initial?.emoji ?? DEFAULT_EMOJI);
   const [rotationOrder, setRotationOrder] = useState<string[]>(
     initial?.rotationOrder ?? [],
   );
@@ -86,7 +83,6 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
         await updateChore(initial.id, {
           name,
           color,
-          emoji,
           rotationOrder: mode === "rotation" ? rotationOrder : [],
           allowProxyComplete,
           fixedSchedule: mode === "fixed" ? fixedSchedule : [],
@@ -98,7 +94,6 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
           name,
           mode,
           color,
-          emoji,
           rotationOrder: mode === "rotation" ? rotationOrder : [],
           allowProxyComplete,
           fixedSchedule: mode === "fixed" ? fixedSchedule : [],
@@ -128,10 +123,6 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
           maxLength={30}
           className="input"
         />
-      </Field>
-
-      <Field label="아이콘">
-        <EmojiPicker value={emoji} onChange={setEmoji} />
       </Field>
 
       <Field label="색상">
@@ -293,70 +284,6 @@ function ColorPicker({
           />
         );
       })}
-    </div>
-  );
-}
-
-function EmojiPicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (e: string) => void;
-}) {
-  // 이모지는 가변 길이(ZWJ/skin-tone variant 포함). 사용자 입력 그대로 보존,
-  // 길이는 maxLength=12로 한 emoji 정도만 들어가도록 제한.
-  function takeLastEmoji(raw: string): string {
-    return raw.trim();
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(takeLastEmoji(e.target.value))}
-          placeholder="🍽️ 직접 입력 가능"
-          className="input w-32 text-center text-xl"
-          maxLength={12}
-          aria-label="아이콘 자유 입력"
-        />
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-muted hover:text-chore-red"
-        >
-          비우기
-        </button>
-        <span className="text-[11px] text-muted">
-          맥: ⌃⌘Space · 윈도우: Win+. · 모바일: 이모지 키보드
-        </span>
-      </div>
-      <div>
-        <p className="mb-1.5 text-xs text-muted">추천</p>
-        <div className="flex flex-wrap gap-2">
-          {EMOJI_PALETTE.map((e) => {
-            const selected = value === e;
-            return (
-              <button
-                key={e}
-                type="button"
-                onClick={() => onChange(e)}
-                aria-label={`아이콘 ${e}`}
-                className={[
-                  "flex h-9 w-9 items-center justify-center rounded-lg border text-lg transition",
-                  selected
-                    ? "border-brand bg-brand/10 ring-2 ring-brand/30"
-                    : "border-border bg-surface hover:bg-background",
-                ].join(" ")}
-              >
-                {e}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
