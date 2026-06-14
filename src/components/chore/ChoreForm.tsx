@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,6 +19,8 @@ import type {
   GroupDoc,
 } from "@/lib/types/firestore";
 import { mapFirestoreError } from "@/lib/firebase/errors";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useUserDoc } from "@/lib/hooks/useUserDoc";
 
 const WEEKDAY_LABELS: Record<number, string> = {
   0: "일",
@@ -38,6 +40,23 @@ export interface ChoreFormProps {
 export function ChoreForm({ group, initial }: ChoreFormProps) {
   const router = useRouter();
   const isEdit = !!initial;
+
+  const { user } = useAuth();
+  const { userDoc } = useUserDoc();
+  const myUid = user?.uid ?? "";
+  const myName = userDoc?.name ?? user?.displayName ?? "";
+
+  // group.memberNames에서 누락된 본인 이름을 자가 보완. 다른 멤버는 cache 그대로.
+  const augmentedNames = useMemo<Record<string, string>>(() => {
+    const base: Record<string, string> = { ...(group.memberNames ?? {}) };
+    if (myUid && myName && !base[myUid]) base[myUid] = myName;
+    return base;
+  }, [group.memberNames, myUid, myName]);
+
+  const augmentedGroup = useMemo<GroupDoc>(
+    () => ({ ...group, memberNames: augmentedNames }),
+    [group, augmentedNames],
+  );
 
   const [name, setName] = useState(initial?.name ?? "");
   const [mode, setMode] = useState<ChoreMode>(initial?.mode ?? "rotation");
@@ -132,9 +151,10 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
         <>
           <Field label="참여 멤버 · 순서">
             <RotationOrderEditor
-              group={group}
+              group={augmentedGroup}
               value={rotationOrder}
               onChange={setRotationOrder}
+              myUid={myUid}
             />
           </Field>
           <Field label="대신 완료 허용">
@@ -154,7 +174,7 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
       ) : (
         <Field label="고정 스케줄">
           <FixedScheduleEditor
-            group={group}
+            group={augmentedGroup}
             value={fixedSchedule}
             onChange={setFixedSchedule}
           />
@@ -284,27 +304,59 @@ function EmojiPicker({
   value: string;
   onChange: (e: string) => void;
 }) {
+  // 이모지는 가변 길이(ZWJ/skin-tone variant 포함). 사용자 입력 그대로 보존,
+  // 길이는 maxLength=12로 한 emoji 정도만 들어가도록 제한.
+  function takeLastEmoji(raw: string): string {
+    return raw.trim();
+  }
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {EMOJI_PALETTE.map((e) => {
-        const selected = value === e;
-        return (
-          <button
-            key={e}
-            type="button"
-            onClick={() => onChange(e)}
-            aria-label={`아이콘 ${e}`}
-            className={[
-              "flex h-9 w-9 items-center justify-center rounded-lg border text-lg transition",
-              selected
-                ? "border-brand bg-brand/10 ring-2 ring-brand/30"
-                : "border-border bg-surface hover:bg-background",
-            ].join(" ")}
-          >
-            {e}
-          </button>
-        );
-      })}
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(takeLastEmoji(e.target.value))}
+          placeholder="🍽️ 직접 입력 가능"
+          className="input w-32 text-center text-xl"
+          maxLength={12}
+          aria-label="아이콘 자유 입력"
+        />
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-muted hover:text-chore-red"
+        >
+          비우기
+        </button>
+        <span className="text-[11px] text-muted">
+          맥: ⌃⌘Space · 윈도우: Win+. · 모바일: 이모지 키보드
+        </span>
+      </div>
+      <div>
+        <p className="mb-1.5 text-xs text-muted">추천</p>
+        <div className="flex flex-wrap gap-2">
+          {EMOJI_PALETTE.map((e) => {
+            const selected = value === e;
+            return (
+              <button
+                key={e}
+                type="button"
+                onClick={() => onChange(e)}
+                aria-label={`아이콘 ${e}`}
+                className={[
+                  "flex h-9 w-9 items-center justify-center rounded-lg border text-lg transition",
+                  selected
+                    ? "border-brand bg-brand/10 ring-2 ring-brand/30"
+                    : "border-border bg-surface hover:bg-background",
+                ].join(" ")}
+              >
+                {e}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -313,16 +365,24 @@ function RotationOrderEditor({
   group,
   value,
   onChange,
+  myUid,
 }: {
   group: GroupDoc;
   value: string[];
   onChange: (next: string[]) => void;
+  myUid: string;
 }) {
   const allMembers = group.memberUids;
   const inOrder = value;
   const notInOrder = allMembers.filter((uid) => !inOrder.includes(uid));
 
-  const nameOf = (uid: string) => group.memberNames?.[uid] ?? uid.slice(0, 6);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+
+  const nameOf = (uid: string) =>
+    group.memberNames?.[uid] ?? `사용자(${uid.slice(0, 4)})`;
+  const labelFor = (uid: string) =>
+    uid === myUid ? `${nameOf(uid)} (나)` : nameOf(uid);
 
   function add(uid: string) {
     onChange([...inOrder, uid]);
@@ -330,60 +390,114 @@ function RotationOrderEditor({
   function remove(uid: string) {
     onChange(inOrder.filter((x) => x !== uid));
   }
-  function move(idx: number, dir: -1 | 1) {
+  function reorder(from: number, to: number) {
+    if (from === to || from < 0 || to < 0) return;
+    if (from >= inOrder.length || to >= inOrder.length) return;
     const next = [...inOrder];
-    const swap = idx + dir;
-    if (swap < 0 || swap >= next.length) return;
-    [next[idx], next[swap]] = [next[swap], next[idx]];
+    const [picked] = next.splice(from, 1);
+    next.splice(to, 0, picked);
     onChange(next);
+  }
+  function move(idx: number, dir: -1 | 1) {
+    reorder(idx, idx + dir);
   }
 
   return (
     <div className="space-y-3">
       <div>
-        <p className="mb-1.5 text-xs text-muted">현재 순서</p>
+        <p className="mb-1.5 text-xs text-muted">
+          현재 순서 <span className="text-muted/70">· 드래그(⋮⋮)로 순서 변경</span>
+        </p>
         {inOrder.length === 0 ? (
           <p className="rounded-lg bg-background px-3 py-2 text-xs text-muted">
             아래에서 멤버를 추가하세요.
           </p>
         ) : (
           <ol className="space-y-1.5">
-            {inOrder.map((uid, idx) => (
-              <li
-                key={uid}
-                className="flex items-center gap-2 rounded-lg bg-background px-3 py-2"
-              >
-                <span className="w-5 text-center text-xs font-bold text-muted">
-                  {idx + 1}
-                </span>
-                <span className="flex-1 text-sm text-foreground">{nameOf(uid)}</span>
-                <button
-                  type="button"
-                  onClick={() => move(idx, -1)}
-                  disabled={idx === 0}
-                  className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
-                  aria-label="위로"
+            {inOrder.map((uid, idx) => {
+              const isDragging = dragIdx === idx;
+              const isOver = overIdx === idx && dragIdx !== idx;
+              return (
+                <li
+                  key={uid}
+                  draggable
+                  onDragStart={(e) => {
+                    setDragIdx(idx);
+                    e.dataTransfer.effectAllowed = "move";
+                    // Firefox 호환
+                    try {
+                      e.dataTransfer.setData("text/plain", String(idx));
+                    } catch {
+                      /* noop */
+                    }
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "move";
+                    if (overIdx !== idx) setOverIdx(idx);
+                  }}
+                  onDragLeave={() => {
+                    if (overIdx === idx) setOverIdx(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (dragIdx !== null) reorder(dragIdx, idx);
+                    setDragIdx(null);
+                    setOverIdx(null);
+                  }}
+                  onDragEnd={() => {
+                    setDragIdx(null);
+                    setOverIdx(null);
+                  }}
+                  className={[
+                    "flex items-center gap-2 rounded-lg bg-background px-3 py-2 transition",
+                    isDragging && "opacity-50",
+                    isOver && "ring-2 ring-brand/40",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
-                  ▲
-                </button>
-                <button
-                  type="button"
-                  onClick={() => move(idx, 1)}
-                  disabled={idx === inOrder.length - 1}
-                  className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
-                  aria-label="아래로"
-                >
-                  ▼
-                </button>
-                <button
-                  type="button"
-                  onClick={() => remove(uid)}
-                  className="rounded px-1.5 py-0.5 text-xs text-muted hover:text-chore-red"
-                >
-                  제외
-                </button>
-              </li>
-            ))}
+                  <span
+                    className="cursor-grab select-none text-base leading-none text-muted active:cursor-grabbing"
+                    aria-label="드래그 핸들"
+                    title="드래그로 순서 변경"
+                  >
+                    ⋮⋮
+                  </span>
+                  <span className="w-5 text-center text-xs font-bold text-muted">
+                    {idx + 1}
+                  </span>
+                  <span className="flex-1 text-sm text-foreground">
+                    {labelFor(uid)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => move(idx, -1)}
+                    disabled={idx === 0}
+                    className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
+                    aria-label="위로"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(idx, 1)}
+                    disabled={idx === inOrder.length - 1}
+                    className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
+                    aria-label="아래로"
+                  >
+                    ▼
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(uid)}
+                    className="rounded px-1.5 py-0.5 text-xs text-muted hover:text-chore-red"
+                  >
+                    제외
+                  </button>
+                </li>
+              );
+            })}
           </ol>
         )}
       </div>
@@ -399,7 +513,7 @@ function RotationOrderEditor({
                 onClick={() => add(uid)}
                 className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground hover:bg-background"
               >
-                + {nameOf(uid)}
+                + {labelFor(uid)}
               </button>
             ))}
           </div>
@@ -418,7 +532,8 @@ function FixedScheduleEditor({
   value: FixedScheduleEntry[];
   onChange: (next: FixedScheduleEntry[]) => void;
 }) {
-  const nameOf = (uid: string) => group.memberNames?.[uid] ?? uid.slice(0, 6);
+  const nameOf = (uid: string) =>
+    group.memberNames?.[uid] ?? `사용자(${uid.slice(0, 4)})`;
 
   function addWeekly() {
     onChange([
