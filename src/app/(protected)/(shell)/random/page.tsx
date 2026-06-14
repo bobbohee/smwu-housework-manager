@@ -13,7 +13,7 @@ export default function RandomPage() {
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-md px-4 pb-6 md:px-6 md:pb-8">
+      <div className="mx-auto max-w-3xl px-4 pb-6 md:px-6 md:pb-8">
         <div className="border-b border-border py-3.5">
           <span className="text-base font-bold text-foreground">💣 꽝뽑기</span>
         </div>
