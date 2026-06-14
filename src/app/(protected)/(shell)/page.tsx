@@ -2,52 +2,22 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
-import { signOut } from "@/lib/firebase/auth";
-import { mapAuthError, mapFirestoreError } from "@/lib/firebase/errors";
+import { mapFirestoreError } from "@/lib/firebase/errors";
 import { GroupBar } from "@/components/group/GroupBar";
 import { ChoreError, completeRotation } from "@/lib/chore/operations";
 import { dutyUidsForToday } from "@/lib/chore/fixed-schedule";
 import type { ChoreDoc, GroupDoc } from "@/lib/types/firestore";
 
 export default function HomePage() {
-  const router = useRouter();
   const { user } = useAuth();
   const { groups, activeGroup, loading, error } = useActiveGroup();
-  const [signingOut, setSigningOut] = useState(false);
-  const [signOutError, setSignOutError] = useState<string | null>(null);
-
-  async function onSignOut() {
-    setSignOutError(null);
-    setSigningOut(true);
-    try {
-      await signOut();
-      router.replace("/login");
-    } catch (err) {
-      setSignOutError(mapAuthError(err));
-      setSigningOut(false);
-    }
-  }
-
-  const displayName = user?.displayName ?? user?.email ?? "사용자";
 
   return (
     <>
-      <GroupBar
-        right={
-          <button
-            onClick={onSignOut}
-            disabled={signingOut}
-            className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground hover:bg-background disabled:opacity-50"
-            title={`${displayName}님 로그아웃`}
-          >
-            {signingOut ? "…" : "로그아웃"}
-          </button>
-        }
-      />
+      <GroupBar />
 
       <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
         {error ? (
@@ -61,12 +31,6 @@ export default function HomePage() {
         ) : activeGroup ? (
           <ActiveGroupHome group={activeGroup} myUid={user?.uid ?? ""} />
         ) : null}
-
-        {signOutError && (
-          <p className="mt-4 rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
-            {signOutError}
-          </p>
-        )}
       </div>
     </>
   );
