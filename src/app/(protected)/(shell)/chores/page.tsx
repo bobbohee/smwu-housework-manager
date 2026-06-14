@@ -20,7 +20,10 @@ export default function ChoresPage() {
         <div className="flex items-baseline justify-between">
           <h1 className="text-lg font-bold text-foreground">집안일 관리</h1>
           {activeGroup && (
-            <Link href="/chores/new" className="btn btn-primary btn-sm">
+            <Link
+              href="/chores/new"
+              className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-brand-foreground hover:opacity-90"
+            >
               + 추가
             </Link>
           )}
@@ -99,7 +102,7 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
 
   return (
     <li
-      className="flex items-center gap-3 rounded-xl border px-3 py-3 shadow-sm transition hover:shadow-md"
+      className="flex items-center gap-3 rounded-xl border px-3 py-3"
       style={{
         backgroundColor: hexAlpha(chore.color, 22),
         borderColor: hexAlpha(chore.color, 70),
@@ -123,7 +126,7 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
       <button
         onClick={onDelete}
         disabled={deleting}
-        className="btn btn-secondary btn-sm hover:text-chore-red"
+        className="rounded-md border border-border bg-surface px-2 py-1 text-[11px] text-muted hover:text-chore-red disabled:opacity-50"
         title="삭제"
       >
         {deleting ? "…" : "삭제"}

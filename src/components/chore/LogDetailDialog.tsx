@@ -33,11 +33,11 @@ export function LogDetailDialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/35 p-4 sm:items-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-border bg-surface p-5 shadow-2xl ring-1 ring-black/5"
+        className="w-full max-w-md rounded-xl border border-border bg-surface p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">

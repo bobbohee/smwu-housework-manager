@@ -17,16 +17,19 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-0.5 px-3 py-4">
+      <nav className="flex-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={["nav-link", active && "nav-link-active"]
-                .filter(Boolean)
-                .join(" ")}
+              className={[
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
+                active
+                  ? "bg-brand/10 text-brand"
+                  : "text-foreground hover:bg-background",
+              ].join(" ")}
             >
               <span className="text-lg">{item.icon}</span>
               <span>{item.label}</span>

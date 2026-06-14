@@ -284,7 +284,7 @@ function RotationCard({
 
   return (
     <li
-      className="group flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-3 text-center"
       style={{
         backgroundColor: hexAlpha(chore.color, 22),
         borderColor: hexAlpha(chore.color, 70),

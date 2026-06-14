@@ -188,10 +188,17 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
       )}
 
       <div className="flex gap-2">
-        <button type="submit" disabled={submitting} className="btn btn-primary btn-lg flex-1">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex-1 rounded-lg bg-brand py-2.5 font-semibold text-brand-foreground hover:opacity-90 disabled:opacity-50"
+        >
           {submitting ? "저장 중…" : isEdit ? "저장" : "추가"}
         </button>
-        <Link href="/chores" className="btn btn-secondary btn-lg">
+        <Link
+          href="/chores"
+          className="rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground hover:bg-background"
+        >
           취소
         </Link>
       </div>
