@@ -284,34 +284,34 @@ function RotationCard({
 
   return (
     <li
-      className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border p-3 text-center"
+      className="flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border p-5 text-center transition"
       style={{
-        backgroundColor: hexAlpha(chore.color, 22),
-        borderColor: hexAlpha(chore.color, 70),
+        backgroundColor: hexAlpha(chore.color, 14),
+        borderColor: hexAlpha(chore.color, 40),
       }}
     >
       <p
-        className="text-sm font-bold leading-tight"
+        className="text-base font-bold leading-tight"
         style={{ color: chore.color }}
       >
         {chore.name}
       </p>
       {hasMembers && turnUid ? (
-        <p className="text-sm font-bold leading-tight text-foreground">
+        <p className="text-lg font-bold leading-tight text-foreground">
           {memberName(group, turnUid)}
           {isMyTurn && (
-            <span className="ml-0.5 text-[10px] font-semibold text-brand">
+            <span className="ml-1 text-[11px] font-semibold text-brand">
               (나)
             </span>
           )}
         </p>
       ) : (
-        <p className="text-[11px] text-muted">참여 멤버 미설정</p>
+        <p className="text-xs text-muted">참여 멤버 미설정</p>
       )}
       <button
         onClick={onComplete}
         disabled={!canComplete || submitting}
-        className="mt-1 rounded-md px-3 py-1 text-[11px] font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-1 rounded-md px-4 py-1.5 text-xs font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40"
         style={{
           backgroundColor: canComplete && !submitting ? chore.color : "#94a3b8",
         }}
@@ -319,7 +319,7 @@ function RotationCard({
         {submitting ? "처리 중…" : "완료"}
       </button>
       {chore.allowProxyComplete && (
-        <span className="text-[9px] text-muted">대신 완료 허용</span>
+        <span className="text-[10px] text-muted">대신 완료 허용</span>
       )}
       {error && (
         <p className="rounded bg-chore-red/10 px-1.5 py-0.5 text-[10px] text-chore-red">
