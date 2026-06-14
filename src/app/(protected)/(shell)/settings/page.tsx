@@ -13,6 +13,7 @@ import {
 } from "@/lib/group/operations";
 import { GroupBar } from "@/components/group/GroupBar";
 import { mapFirestoreError } from "@/lib/firebase/errors";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -59,6 +60,17 @@ export default function SettingsPage() {
               busy={busy}
               setBusy={setBusy}
             />
+
+            <Link
+              href="/chores"
+              className="flex items-center justify-between rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-border transition hover:bg-background"
+            >
+              <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <span>📋</span>
+                <span>집안일 관리</span>
+              </span>
+              <span className="text-muted">›</span>
+            </Link>
 
             <LeaveSection
               groupId={activeGroup.id}

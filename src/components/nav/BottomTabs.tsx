@@ -8,7 +8,7 @@ export function BottomTabs() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky bottom-0 grid grid-cols-6 border-t border-border bg-surface md:hidden">
+    <nav className="sticky bottom-0 grid grid-cols-5 border-t border-border bg-surface md:hidden">
       {NAV_ITEMS.map((item) => {
         const active = isActive(pathname, item.href);
         return (
