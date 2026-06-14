@@ -296,7 +296,6 @@ describe("choreLog", () => {
     completedBy: "alice",
     completedByActual: "alice",
     completedAt: new Date(),
-    type: "rotation",
     active: true,
     ...overrides,
   });

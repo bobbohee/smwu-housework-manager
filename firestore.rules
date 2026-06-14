@@ -204,7 +204,6 @@ service cloud.firestore {
                     && request.resource.data.completedByActual == request.auth.uid
                     && request.resource.data.completedBy is string
                     && request.resource.data.choreId is string
-                    && request.resource.data.type in ['rotation', 'random']
                     && request.resource.data.active == true;
 
       // 방장 비활성화: active만 true→false, deactivate 메타 필드 동시 입력
