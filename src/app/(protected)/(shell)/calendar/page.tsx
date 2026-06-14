@@ -52,7 +52,7 @@ export default function CalendarPage() {
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
         {/* 월 네비게이션 — 와이어와 동일하게 좌우 ◀▶ + 중앙 라벨 */}
         <div className="flex items-center justify-between border-b border-border py-3.5">
           <button

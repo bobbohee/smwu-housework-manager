@@ -49,7 +49,7 @@ export default function HomePage() {
         }
       />
 
-      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
         {error ? (
           <p className="rounded-lg bg-chore-red/10 px-3 py-2 text-sm text-chore-red">
             {error}
