@@ -382,7 +382,7 @@ function RotationOrderEditor({
                     .join(" ")}
                 >
                   <span
-                    className="cursor-grab select-none text-sm leading-none tracking-[-0.15em] text-muted active:cursor-grabbing"
+                    className="cursor-grab select-none text-sm leading-none tracking-[-0.5em] pr-1 text-muted active:cursor-grabbing"
                     aria-label="드래그 핸들"
                     title="드래그로 순서 변경"
                   >
