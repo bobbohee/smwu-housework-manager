@@ -5,7 +5,7 @@ export interface RandomResultCardProps {
   onReset: () => void;
 }
 
-const PINK = "#E91E8C";
+const PINK = "#ec4899"; // pink-500
 
 export function RandomResultCard({
   allUids,

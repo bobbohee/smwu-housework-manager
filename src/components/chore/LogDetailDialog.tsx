@@ -111,7 +111,7 @@ function LogDetail({
       })
     : "";
   const proxy = log.completedByActual !== log.completedBy;
-  const color = chore?.color ?? "#94A3B8";
+  const color = chore?.color ?? "#94a3b8";
 
   return (
     <li className="space-y-2.5">

@@ -313,7 +313,7 @@ function RotationCard({
         disabled={!canComplete || submitting}
         className="mt-1 rounded-md px-3 py-1 text-[11px] font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40"
         style={{
-          backgroundColor: canComplete && !submitting ? chore.color : "#9aa3af",
+          backgroundColor: canComplete && !submitting ? chore.color : "#94a3b8",
         }}
       >
         {submitting ? "처리 중…" : "완료"}

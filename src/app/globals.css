@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  /* 베이스 토큰 — 와이어프레임 기반에서 채도·명도 살짝 올려 깨끗한 인상 */
-  --color-background: #f6f8fc;
-  --color-surface: #ffffff;
-  --color-surface-2: #f1f4fa;
-  --color-foreground: #0f172a;
-  --color-muted: #475569;
-  --color-border: #dde3ec;
-  --color-dim: #94a3b8;
+  /* 베이스 토큰 = Tailwind palette hex 직접 매핑 (slate 계열 + white) */
+  --color-background: #f8fafc;       /* slate-50 */
+  --color-surface: #ffffff;          /* white */
+  --color-surface-2: #f1f5f9;        /* slate-100 */
+  --color-foreground: #0f172a;       /* slate-900 */
+  --color-muted: #475569;            /* slate-600 */
+  --color-border: #e2e8f0;           /* slate-200 */
+  --color-dim: #94a3b8;              /* slate-400 */
 
-  --color-brand: #2563eb;
-  --color-brand-foreground: #ffffff;
+  --color-brand: #2563eb;            /* blue-600 */
+  --color-brand-foreground: #ffffff; /* white */
 
-  /* Chore 팔레트 — Tailwind 500계열 위주로 채도 향상 (탁함 제거) */
-  --color-chore-blue: #3b82f6;
-  --color-chore-red: #ef4444;
-  --color-chore-green: #10b981;
-  --color-chore-orange: #f59e0b;
-  --color-chore-purple: #a855f7;
-  --color-chore-teal: #14b8a6;
-  --color-chore-pink: #ec4899;
-  --color-chore-navy: #475569;
-  --color-chore-gray: #94a3b8;
-  --color-chore-yellow: #eab308;
+  /* Chore 팔레트 — Tailwind 500 계열 표준 (vivid) */
+  --color-chore-blue: #3b82f6;       /* blue-500 */
+  --color-chore-red: #ef4444;        /* red-500 */
+  --color-chore-green: #10b981;      /* emerald-500 */
+  --color-chore-orange: #f59e0b;     /* amber-500 */
+  --color-chore-purple: #a855f7;     /* purple-500 */
+  --color-chore-teal: #14b8a6;       /* teal-500 */
+  --color-chore-pink: #ec4899;       /* pink-500 */
+  --color-chore-navy: #475569;       /* slate-600 */
+  --color-chore-gray: #94a3b8;       /* slate-400 */
+  --color-chore-yellow: #eab308;     /* yellow-500 */
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

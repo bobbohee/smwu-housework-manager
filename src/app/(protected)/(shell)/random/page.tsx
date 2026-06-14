@@ -149,7 +149,7 @@ function RandomDraw({ group }: { group: GroupDoc }) {
         onClick={onDraw}
         disabled={selectedCount === 0}
         className="w-full rounded-lg py-3.5 text-base font-bold text-white hover:opacity-90 disabled:opacity-40"
-        style={{ backgroundColor: "#E91E8C" }}
+        style={{ backgroundColor: "#ec4899" }}
       >
         💣 꽝뽑기!
       </button>

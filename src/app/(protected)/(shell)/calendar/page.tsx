@@ -209,7 +209,7 @@ function DayCell({
       <div className="flex min-h-[8px] flex-wrap items-center justify-center gap-[3px]">
         {visible.map((log) => {
           const chore = choreById.get(log.choreId);
-          const color = chore?.color ?? "#95A5A6";
+          const color = chore?.color ?? "#94a3b8";
           return (
             <span
               key={log.id}
@@ -249,7 +249,7 @@ function LogRow({
         minute: "2-digit",
       })
     : "";
-  const color = chore?.color ?? "#95A5A6";
+  const color = chore?.color ?? "#94a3b8";
 
   if (!log.active) {
     return (
