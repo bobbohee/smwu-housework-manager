@@ -8,7 +8,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-surface md:flex">
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-background md:flex">
       <div className="flex items-center gap-2 border-b border-border px-6 py-5">
         <span className="text-2xl">🏠</span>
         <div className="leading-tight">
