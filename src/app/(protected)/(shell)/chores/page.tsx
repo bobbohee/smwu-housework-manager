@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { GroupBar } from "@/components/group/GroupBar";
 import { useActiveGroup } from "@/lib/hooks/useActiveGroup";
 import { useChores } from "@/lib/hooks/useChores";
-import { ChoreError, deleteChore } from "@/lib/chore/operations";
-import { mapFirestoreError } from "@/lib/firebase/errors";
 import type { ChoreDoc } from "@/lib/types/firestore";
 
 export default function ChoresPage() {
@@ -77,29 +74,6 @@ function hexAlpha(hex: string, pct: number): string {
 }
 
 function ChoreRow({ chore }: { chore: ChoreDoc }) {
-  const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onDelete(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!confirm(`"${chore.name}"을(를) 삭제할까요? 기존 완료 기록은 보존됩니다.`)) {
-      return;
-    }
-    setError(null);
-    setDeleting(true);
-    try {
-      await deleteChore(chore.id);
-    } catch (err) {
-      setError(
-        err instanceof ChoreError
-          ? err.message
-          : mapFirestoreError(err, "삭제 실패."),
-      );
-      setDeleting(false);
-    }
-  }
-
   return (
     <li
       className="flex items-center gap-3 rounded-xl border px-3 py-3"
@@ -122,15 +96,6 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
           {chore.allowProxyComplete && " · 대신 완료 허용"}
         </p>
       </Link>
-
-      <button
-        onClick={onDelete}
-        disabled={deleting}
-        className="rounded-md border border-border bg-surface px-2 py-1 text-[11px] text-muted hover:text-chore-red disabled:opacity-50"
-        title="삭제"
-      >
-        {deleting ? "…" : "삭제"}
-      </button>
       <Link
         href={`/chores/${chore.id}`}
         className="text-muted hover:text-foreground"
@@ -138,10 +103,6 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
       >
         ›
       </Link>
-
-      {error && (
-        <p className="ml-2 text-xs text-chore-red">{error}</p>
-      )}
     </li>
   );
 }
