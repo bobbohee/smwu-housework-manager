@@ -206,6 +206,45 @@ describe("groups", () => {
       }),
     );
   });
+
+  it("본인 memberNames self-heal 성공", async () => {
+    await seedGroup({
+      id: "g1",
+      ownerId: "alice",
+      memberUids: ["alice", "bob"],
+    });
+    await assertSucceeds(
+      updateDoc(doc(bobDb(), "groups", "g1"), {
+        "memberNames.bob": "Bob",
+      }),
+    );
+  });
+
+  it("타인 memberNames 수정 거부", async () => {
+    await seedGroup({
+      id: "g1",
+      ownerId: "alice",
+      memberUids: ["alice", "bob"],
+    });
+    await assertFails(
+      updateDoc(doc(bobDb(), "groups", "g1"), {
+        "memberNames.alice": "Evil",
+      }),
+    );
+  });
+
+  it("빈 이름으로 memberNames self-heal 거부", async () => {
+    await seedGroup({
+      id: "g1",
+      ownerId: "alice",
+      memberUids: ["alice", "bob"],
+    });
+    await assertFails(
+      updateDoc(doc(bobDb(), "groups", "g1"), {
+        "memberNames.bob": "",
+      }),
+    );
+  });
 });
 
 describe("chores", () => {

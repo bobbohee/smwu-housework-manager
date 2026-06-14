@@ -11,7 +11,7 @@ import {
 import { arrayRemove, updateDoc } from "firebase/firestore";
 import { useGroups } from "@/lib/hooks/useGroups";
 import { useUserDoc } from "@/lib/hooks/useUserDoc";
-import { userRef } from "@/lib/firebase/collections";
+import { groupRef, userRef } from "@/lib/firebase/collections";
 import type { GroupDoc } from "@/lib/types/firestore";
 
 const STORAGE_KEY = "smwu-active-group-id";
@@ -60,6 +60,22 @@ export function ActiveGroupProvider({ children }: { children: ReactNode }) {
     }).catch((e) => {
       console.warn("[groupIds 자가 정리 실패]", e);
     });
+  }, [loading, userDoc, groups]);
+
+  // memberNames self-heal: 본인 이름이 그룹 memberNames에 누락되거나 stale이면 채움.
+  // 합류 batch 실패 또는 displayName 부재 케이스 회복. 그룹별 1회만 시도.
+  useEffect(() => {
+    if (loading || !userDoc) return;
+    const myName = userDoc.name?.trim();
+    if (!myName) return;
+    for (const g of groups) {
+      if (g.memberNames?.[userDoc.uid] === myName) continue;
+      updateDoc(groupRef(g.id), {
+        [`memberNames.${userDoc.uid}`]: myName,
+      }).catch((e) => {
+        console.warn("[memberNames 자가 정리 실패]", g.id, e);
+      });
+    }
   }, [loading, userDoc, groups]);
 
   // 활성 ID는 derived. 사용자 선택값이 유효하면 그대로, 아니면 첫 그룹으로 fallback.

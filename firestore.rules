@@ -100,6 +100,21 @@ service cloud.firestore {
                        )
                     && onlyChanged(['memberUids', 'memberNames']);
 
+      // d) 본인 이름 self-heal: 멤버가 자기 memberNames 키만 수정 허용
+      //    합류 시 batch가 누락됐거나 displayName이 비어있던 케이스 회복용.
+      //    legacy group(memberNames 필드 자체 없음)도 대응하기 위해 get(default)
+      allow update: if isSignedIn()
+                    && request.auth.uid in resource.data.memberUids
+                    && request.resource.data.memberUids == resource.data.memberUids
+                    && onlyChanged(['memberNames'])
+                    && request.resource.data.memberNames
+                         .diff(resource.data.get('memberNames', {}))
+                         .affectedKeys()
+                         .hasOnly([request.auth.uid])
+                    && request.resource.data.memberNames[request.auth.uid] is string
+                    && request.resource.data.memberNames[request.auth.uid].size() > 0
+                    && request.resource.data.memberNames[request.auth.uid].size() <= 30;
+
       allow delete: if isOwner();
     }
 
