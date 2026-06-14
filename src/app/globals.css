@@ -45,4 +45,59 @@ body {
   .input {
     @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted/70 focus:border-brand focus:ring-2 focus:ring-brand/20;
   }
+
+  /* 버튼 기본 — 사이즈·hover·focus 공통 */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-sm {
+    @apply px-2.5 py-1 text-xs;
+  }
+  .btn-lg {
+    @apply px-4 py-2.5 text-base;
+  }
+
+  /* 의도별 색상 변형 */
+  .btn-primary {
+    @apply bg-brand text-brand-foreground shadow-sm hover:bg-brand/90 active:bg-brand;
+  }
+  .btn-secondary {
+    @apply border border-border bg-surface text-foreground hover:bg-surface-2;
+  }
+  .btn-ghost {
+    @apply text-muted hover:bg-surface-2 hover:text-foreground;
+  }
+  .btn-danger {
+    @apply border border-chore-red/30 bg-chore-red/10 text-chore-red hover:bg-chore-red/20;
+  }
+  .btn-danger-solid {
+    @apply bg-chore-red text-white shadow-sm hover:bg-chore-red/90;
+  }
+
+  /* 카드 */
+  .card {
+    @apply rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-border;
+  }
+  .card-tight {
+    @apply rounded-xl bg-surface p-4 shadow-sm ring-1 ring-border;
+  }
+
+  /* 작은 라벨 / 배지 */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold;
+  }
+  .badge-brand {
+    @apply bg-brand/10 text-brand;
+  }
+  .badge-muted {
+    @apply bg-surface-2 text-muted;
+  }
+
+  /* 사이드바 navlink */
+  .nav-link {
+    @apply flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-2 hover:text-foreground;
+  }
+  .nav-link-active {
+    @apply bg-brand/10 text-brand;
+  }
 }

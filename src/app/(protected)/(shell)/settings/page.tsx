@@ -141,11 +141,7 @@ function NameSection({
             className="input"
             autoFocus
           />
-          <button
-            onClick={save}
-            disabled={busy}
-            className="rounded-md bg-brand px-3 py-1.5 text-sm font-semibold text-brand-foreground disabled:opacity-50"
-          >
+          <button onClick={save} disabled={busy} className="btn btn-primary btn-sm">
             저장
           </button>
           <button
@@ -154,7 +150,7 @@ function NameSection({
               setEditing(false);
               setError(null);
             }}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium text-foreground"
+            className="btn btn-secondary btn-sm"
           >
             취소
           </button>
@@ -167,7 +163,7 @@ function NameSection({
               setDraft(name);
               setEditing(true);
             }}
-            className="rounded-md border border-border bg-surface px-3 py-1 text-xs font-medium text-foreground hover:bg-background"
+            className="btn btn-secondary btn-sm"
           >
             수정
           </button>
@@ -204,16 +200,10 @@ function InviteCodeSection({ code }: { code: string }) {
           {code}
         </span>
         <div className="flex gap-2">
-          <button
-            onClick={copy}
-            className="rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground hover:bg-background"
-          >
+          <button onClick={copy} className="btn btn-secondary btn-sm">
             {copied ? "복사됨" : "복사"}
           </button>
-          <button
-            onClick={share}
-            className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground hover:opacity-90"
-          >
+          <button onClick={share} className="btn btn-primary btn-sm">
             공유
           </button>
         </div>
@@ -312,14 +302,14 @@ function MemberSection({
                   <button
                     onClick={() => onTransfer(uid)}
                     disabled={busy}
-                    className="rounded-md border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-background disabled:opacity-50"
+                    className="btn btn-secondary btn-sm"
                   >
                     방장 위임
                   </button>
                   <button
                     onClick={() => onKick(uid)}
                     disabled={busy}
-                    className="rounded-md border border-chore-red bg-chore-red/10 px-2.5 py-1 text-[11px] font-medium text-chore-red hover:bg-chore-red/20 disabled:opacity-50"
+                    className="btn btn-danger btn-sm"
                   >
                     강퇴
                   </button>
@@ -375,7 +365,7 @@ function LeaveSection({
     <button
       onClick={onLeave}
       disabled={busy || isOwner}
-      className="w-full rounded-xl border border-chore-red bg-surface py-2.5 text-sm font-semibold text-chore-red hover:bg-chore-red/5 disabled:opacity-50"
+      className="btn btn-danger w-full"
       title={isOwner ? "방장은 위임 후 나갈 수 있습니다" : undefined}
     >
       그룹 나가기
