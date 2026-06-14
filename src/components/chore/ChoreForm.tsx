@@ -325,9 +325,6 @@ function RotationOrderEditor({
     next.splice(to, 0, picked);
     onChange(next);
   }
-  function move(idx: number, dir: -1 | 1) {
-    reorder(idx, idx + dir);
-  }
 
   return (
     <div className="space-y-3">
@@ -385,7 +382,7 @@ function RotationOrderEditor({
                     .join(" ")}
                 >
                   <span
-                    className="cursor-grab select-none text-base leading-none text-muted active:cursor-grabbing"
+                    className="cursor-grab select-none text-sm leading-none tracking-[-0.15em] text-muted active:cursor-grabbing"
                     aria-label="드래그 핸들"
                     title="드래그로 순서 변경"
                   >
@@ -397,24 +394,6 @@ function RotationOrderEditor({
                   <span className="flex-1 text-sm text-foreground">
                     {labelFor(uid)}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => move(idx, -1)}
-                    disabled={idx === 0}
-                    className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
-                    aria-label="위로"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => move(idx, 1)}
-                    disabled={idx === inOrder.length - 1}
-                    className="rounded px-1.5 py-0.5 text-xs text-muted hover:bg-surface disabled:opacity-30"
-                    aria-label="아래로"
-                  >
-                    ▼
-                  </button>
                   <button
                     type="button"
                     onClick={() => remove(uid)}
