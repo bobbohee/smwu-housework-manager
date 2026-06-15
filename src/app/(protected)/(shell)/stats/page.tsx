@@ -51,6 +51,11 @@ export default function StatsPage() {
     <>
       <GroupBar />
       <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
+        <h1 className="mb-6 flex items-center gap-2 text-lg font-bold text-foreground">
+          <span>📊</span>
+          <span>통계</span>
+        </h1>
+
         <div className="flex items-center justify-between border-b border-border py-3.5">
           <button
             onClick={() => shiftMonth(-1)}

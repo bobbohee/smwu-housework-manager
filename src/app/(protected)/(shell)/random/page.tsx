@@ -14,6 +14,11 @@ export default function RandomPage() {
     <>
       <GroupBar />
       <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
+        <h1 className="mb-6 flex items-center gap-2 text-lg font-bold text-foreground">
+          <span>💣</span>
+          <span>꽝뽑기</span>
+        </h1>
+
         {loading ? (
           <p className="mt-6 text-sm text-muted">불러오는 중…</p>
         ) : !activeGroup ? (
