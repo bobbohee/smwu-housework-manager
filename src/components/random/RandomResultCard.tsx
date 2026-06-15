@@ -6,6 +6,7 @@ export interface RandomResultCardProps {
 }
 
 const PINK = "#ec4899"; // pink-500
+const GREEN = "#22c55e"; // green-500
 
 export function RandomResultCard({
   allUids,
@@ -17,9 +18,9 @@ export function RandomResultCard({
 
   return (
     <div className="mt-6 text-center">
-      <p className="mb-4 text-sm text-muted">당첨자 발표!</p>
+      <p className="mb-16 text-2xl font-bold text-foreground">결과 발표!</p>
 
-      <div className="mb-8 flex flex-wrap items-start justify-center gap-6">
+      <div className="mb-20 flex flex-wrap items-start justify-center gap-6">
         {allUids.map((uid) => {
           const isWinner = winnerSet.has(uid);
           const name = memberNames[uid] ?? uid.slice(0, 4);
@@ -31,24 +32,24 @@ export function RandomResultCard({
               <div
                 className="mb-1.5 flex h-16 w-16 items-center justify-center rounded-full border-2"
                 style={{
-                  borderColor: isWinner ? PINK : "var(--border)",
-                  backgroundColor: isWinner ? PINK + "1F" : "var(--surface)",
+                  borderColor: isWinner ? PINK : GREEN,
+                  backgroundColor: (isWinner ? PINK : GREEN) + "1F",
                 }}
               >
                 <span className="text-3xl">{isWinner ? "💣" : "😌"}</span>
               </div>
               <div
                 className="text-sm"
-                style={{ color: isWinner ? PINK : "var(--muted)" }}
+                style={{ color: isWinner ? PINK : GREEN }}
               >
-                <span className={isWinner ? "font-bold" : ""}>{name}</span>
+                <span className="font-bold">{name}</span>
               </div>
               <div
                 className="text-sm"
-                style={{ color: isWinner ? PINK : "var(--muted)" }}
+                style={{ color: isWinner ? PINK : GREEN }}
               >
-                <span className={isWinner ? "font-semibold" : ""}>
-                  {isWinner ? "당첨!" : "꽝"}
+                <span className="font-semibold">
+                  {isWinner ? "꽝!" : "통과"}
                 </span>
               </div>
             </div>

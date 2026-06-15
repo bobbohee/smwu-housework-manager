@@ -14,10 +14,6 @@ export default function RandomPage() {
     <>
       <GroupBar />
       <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
-        <div className="border-b border-border py-3.5">
-          <span className="text-base font-bold text-foreground">💣 꽝뽑기</span>
-        </div>
-
         {loading ? (
           <p className="mt-6 text-sm text-muted">불러오는 중…</p>
         ) : !activeGroup ? (
@@ -86,9 +82,9 @@ function RandomDraw({ group }: { group: GroupDoc }) {
   }
 
   return (
-    <div className="mt-5 space-y-6">
+    <div className="mt-8 space-y-10">
       <section>
-        <p className="mb-2 text-xs font-semibold text-muted">참여 멤버</p>
+        <p className="mb-3 text-xs font-semibold text-muted">참여 멤버</p>
         <ul className="overflow-hidden rounded-lg border border-border bg-surface">
           {group.memberUids.map((uid) => {
             const checked = selectedUids.has(uid);
@@ -114,7 +110,7 @@ function RandomDraw({ group }: { group: GroupDoc }) {
       </section>
 
       <section>
-        <p className="mb-2 text-xs font-semibold text-muted">당첨 인원</p>
+        <p className="mb-3 text-xs font-semibold text-muted">당첨 인원</p>
         <div className="flex items-center justify-center gap-4">
           <button
             type="button"
