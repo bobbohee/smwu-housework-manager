@@ -41,10 +41,9 @@ function RandomDraw({ group }: { group: GroupDoc }) {
   const [winners, setWinners] = useState<string[]>([]);
 
   const selectedCount = selectedUids.size;
-  const clampedCount = Math.min(
-    Math.max(1, winnerCount),
-    Math.max(1, selectedCount),
-  );
+  const maxWinners = Math.max(0, selectedCount - 1);
+  const clampedCount = Math.min(Math.max(1, winnerCount), Math.max(1, maxWinners));
+  const canDraw = maxWinners >= 1;
 
   function toggleMember(uid: string) {
     setSelectedUids((prev) => {
@@ -59,7 +58,7 @@ function RandomDraw({ group }: { group: GroupDoc }) {
     setWinnerCount((c) => {
       const next = c + delta;
       if (next < 1) return 1;
-      if (next > selectedCount) return Math.max(1, selectedCount);
+      if (next > maxWinners) return Math.max(1, maxWinners);
       return next;
     });
   }
@@ -132,7 +131,7 @@ function RandomDraw({ group }: { group: GroupDoc }) {
           <button
             type="button"
             onClick={() => adjustCount(1)}
-            disabled={clampedCount >= selectedCount}
+            disabled={clampedCount >= maxWinners}
             className="h-9 w-9 rounded-lg border border-border bg-surface text-lg font-bold text-foreground hover:bg-background disabled:opacity-30"
             aria-label="당첨 인원 증가"
           >
@@ -142,12 +141,17 @@ function RandomDraw({ group }: { group: GroupDoc }) {
         <p className="mt-1.5 text-center text-sm text-muted">
           {selectedCount}명 중 {clampedCount}명 당첨
         </p>
+        {!canDraw && (
+          <p className="mt-1 text-center text-xs text-muted">
+            참여 멤버 2명 이상 필요
+          </p>
+        )}
       </section>
 
       <button
         type="button"
         onClick={onDraw}
-        disabled={selectedCount === 0}
+        disabled={!canDraw}
         className="w-full rounded-lg py-3.5 text-base font-bold text-white hover:opacity-90 disabled:opacity-40"
         style={{ backgroundColor: "#ec4899" }}
       >
