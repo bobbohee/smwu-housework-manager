@@ -50,7 +50,7 @@ export default function StatsPage() {
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
+      <div className="mx-auto max-w-3xl px-6 py-7 md:px-10 md:py-9">
         <h1 className="mb-6 flex items-center gap-2 text-lg font-bold text-foreground">
           <span>📊</span>
           <span>통계</span>
