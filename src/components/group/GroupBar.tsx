@@ -16,7 +16,6 @@ export function GroupBar() {
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
 
-  const today = formatToday(new Date());
   const displayName = user?.displayName ?? user?.email ?? "사용자";
 
   async function onSignOut() {
@@ -33,7 +32,7 @@ export function GroupBar() {
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 md:px-6">
+      <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 md:hidden">
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -46,23 +45,20 @@ export function GroupBar() {
           )}
         </button>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted">{today}</span>
-          {user && (
-            <button
-              onClick={onSignOut}
-              disabled={signingOut}
-              className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground hover:bg-background disabled:opacity-50"
-              title={`${displayName}님 로그아웃`}
-            >
-              {signingOut ? "…" : "로그아웃"}
-            </button>
-          )}
-        </div>
+        {user && (
+          <button
+            onClick={onSignOut}
+            disabled={signingOut}
+            className="rounded-md border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground hover:bg-background disabled:opacity-50"
+            title={`${displayName}님 로그아웃`}
+          >
+            {signingOut ? "…" : "로그아웃"}
+          </button>
+        )}
       </div>
 
       {signOutError && (
-        <p className="border-b border-chore-red/30 bg-chore-red/10 px-4 py-2 text-sm text-chore-red md:px-6">
+        <p className="border-b border-chore-red/30 bg-chore-red/10 px-4 py-2 text-sm text-chore-red md:hidden">
           {signOutError}
         </p>
       )}
@@ -70,12 +66,4 @@ export function GroupBar() {
       <GroupSwitcher open={open} onClose={() => setOpen(false)} />
     </>
   );
-}
-
-function formatToday(d: Date): string {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const weekday = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
-  return `${yyyy}.${mm}.${dd} (${weekday})`;
 }
