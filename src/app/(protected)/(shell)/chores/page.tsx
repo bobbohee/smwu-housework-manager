@@ -13,7 +13,7 @@ export default function ChoresPage() {
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-3xl px-6 py-4 md:px-10 md:py-5">
+      <div className="mx-auto max-w-3xl px-6 py-7 md:px-10 md:py-9">
         <div className="flex items-baseline justify-between">
           <h1 className="text-lg font-bold text-foreground">집안일 관리</h1>
           {activeGroup && (
@@ -58,7 +58,7 @@ function EmptyState() {
 
 function ChoreList({ chores }: { chores: ChoreDoc[] }) {
   return (
-    <ul className="mt-4 space-y-2">
+    <ul className="mt-4 space-y-3">
       {chores.map((chore) => (
         <ChoreRow key={chore.id} chore={chore} />
       ))}
@@ -76,7 +76,7 @@ function hexAlpha(hex: string, pct: number): string {
 function ChoreRow({ chore }: { chore: ChoreDoc }) {
   return (
     <li
-      className="flex items-center gap-3 rounded-xl border px-3 py-3"
+      className="flex items-center gap-3 rounded-xl border px-4 py-3.5"
       style={{
         backgroundColor: hexAlpha(chore.color, 22),
         borderColor: hexAlpha(chore.color, 70),
@@ -98,10 +98,22 @@ function ChoreRow({ chore }: { chore: ChoreDoc }) {
       </Link>
       <Link
         href={`/chores/${chore.id}`}
-        className="text-muted hover:text-foreground"
+        className="shrink-0 text-muted hover:text-foreground"
         aria-label="편집"
       >
-        ›
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className="h-6 w-6"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M7.21 14.77a.75.75 0 0 1 .02-1.06L10.94 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.25 4.25a.75.75 0 0 1 0 1.08l-4.25 4.25a.75.75 0 0 1-1.06-.02Z"
+            clipRule="evenodd"
+          />
+        </svg>
       </Link>
     </li>
   );
