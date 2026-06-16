@@ -8,7 +8,7 @@ import { mapFirestoreError } from "@/lib/firebase/errors";
 
 export interface LogDetailDialogProps {
   date: string; // YYYY-MM-DD
-  logs: ChoreLogDoc[];
+  log: ChoreLogDoc;
   choreById: Map<string, ChoreDoc>;
   group: GroupDoc;
   onClose: () => void;
@@ -16,7 +16,7 @@ export interface LogDetailDialogProps {
 
 export function LogDetailDialog({
   date,
-  logs,
+  log,
   choreById,
   group,
   onClose,
@@ -53,20 +53,11 @@ export function LogDetailDialog({
           </button>
         </div>
 
-        {logs.length === 0 ? (
-          <p className="text-sm text-muted">이 날짜의 완료 기록이 없습니다.</p>
-        ) : (
-          <ul className="space-y-4">
-            {logs.map((log) => (
-              <LogDetail
-                key={log.id}
-                log={log}
-                chore={choreById.get(log.choreId)}
-                group={group}
-              />
-            ))}
-          </ul>
-        )}
+        <LogDetail
+          log={log}
+          chore={choreById.get(log.choreId)}
+          group={group}
+        />
       </div>
     </div>
   );
@@ -114,7 +105,7 @@ function LogDetail({
   const color = chore?.color ?? "#94a3b8";
 
   return (
-    <li className="space-y-2.5">
+    <div className="space-y-2.5">
       <Row label="집안일">
         <span
           className={[
@@ -182,7 +173,7 @@ function LogDetail({
       {isOwner && log.active && user && (
         <DeactivateButton logId={log.id} ownerUid={user.uid} />
       )}
-    </li>
+    </div>
   );
 }
 

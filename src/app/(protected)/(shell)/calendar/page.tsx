@@ -23,8 +23,8 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<string>(() =>
     toISO(new Date()),
   );
-  // 셀 클릭 시 다이얼로그도 함께 띄움.
-  const [dialogDate, setDialogDate] = useState<string | null>(null);
+  // 기록 행 클릭 시 다이얼로그에 띄울 단일 log id.
+  const [dialogLogId, setDialogLogId] = useState<string | null>(null);
 
   const choreById = useMemo(() => {
     const map = new Map<string, ChoreDoc>();
@@ -47,7 +47,9 @@ export default function CalendarPage() {
   );
 
   const selectedLogs = logsByDate.get(selectedDate) ?? [];
-  const dialogLogs = dialogDate ? logsByDate.get(dialogDate) ?? [] : [];
+  const dialogLog = dialogLogId
+    ? selectedLogs.find((l) => l.id === dialogLogId) ?? null
+    : null;
 
   return (
     <>
@@ -140,7 +142,7 @@ export default function CalendarPage() {
                       log={log}
                       chore={choreById.get(log.choreId)}
                       group={activeGroup}
-                      onClick={() => setDialogDate(selectedDate)}
+                      onClick={() => setDialogLogId(log.id)}
                     />
                   ))}
                 </ul>
@@ -150,13 +152,13 @@ export default function CalendarPage() {
         )}
       </div>
 
-      {dialogDate && activeGroup && (
+      {dialogLog && activeGroup && (
         <LogDetailDialog
-          date={dialogDate}
-          logs={dialogLogs}
+          date={selectedDate}
+          log={dialogLog}
           choreById={choreById}
           group={activeGroup}
-          onClose={() => setDialogDate(null)}
+          onClose={() => setDialogLogId(null)}
         />
       )}
     </>
