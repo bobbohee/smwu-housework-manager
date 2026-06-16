@@ -191,6 +191,7 @@ function NameSection({
 
 function InviteCodeSection({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   async function copy() {
     await navigator.clipboard.writeText(code);
@@ -199,13 +200,22 @@ function InviteCodeSection({ code }: { code: string }) {
   }
 
   async function share() {
-    if (navigator.share) {
+    if (sharing) return;
+    if (!navigator.share) {
+      await copy();
+      return;
+    }
+    setSharing(true);
+    try {
       await navigator.share({
         title: "우리집 살림 매니저 초대",
         text: `초대 코드: ${code}`,
       });
-    } else {
-      await copy();
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      throw err;
+    } finally {
+      setSharing(false);
     }
   }
 
@@ -224,7 +234,8 @@ function InviteCodeSection({ code }: { code: string }) {
           </button>
           <button
             onClick={share}
-            className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground hover:opacity-90"
+            disabled={sharing}
+            className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground hover:opacity-90 disabled:opacity-50"
           >
             공유
           </button>
