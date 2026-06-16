@@ -253,12 +253,24 @@ function RotationCard({
 
   return (
     <li
-      className="flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border p-5 text-center transition"
+      className="relative flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border p-5 text-center transition"
       style={{
         backgroundColor: hexAlpha(chore.color, 14),
         borderColor: hexAlpha(chore.color, 40),
       }}
     >
+      {chore.allowProxyComplete && (
+        <span
+          className="absolute right-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+          style={{
+            backgroundColor: hexAlpha(chore.color, 25),
+            color: chore.color,
+          }}
+          title="대신 완료 허용"
+        >
+          대신 OK
+        </span>
+      )}
       <p
         className="text-base font-bold leading-tight"
         style={{ color: chore.color }}
@@ -287,9 +299,6 @@ function RotationCard({
       >
         {submitting ? "처리 중…" : "완료"}
       </button>
-      {chore.allowProxyComplete && (
-        <span className="text-sm text-muted">대신 완료 허용</span>
-      )}
       {error && (
         <p className="rounded bg-chore-red/10 px-1.5 py-0.5 text-sm text-chore-red">
           {error}
