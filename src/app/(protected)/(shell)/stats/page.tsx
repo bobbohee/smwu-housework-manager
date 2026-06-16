@@ -88,7 +88,7 @@ export default function StatsPage() {
             </p>
           </div>
         ) : (
-          <div className="mt-6 space-y-8">
+          <div className="mt-10 space-y-14">
             <MemberBarChart
               stats={memberStats}
               memberNames={activeGroup.memberNames}
