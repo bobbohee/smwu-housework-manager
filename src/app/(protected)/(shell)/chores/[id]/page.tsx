@@ -24,9 +24,9 @@ export default function EditChorePage({
   return (
     <>
       <GroupBar />
-      <div className="mx-auto max-w-2xl px-4 py-6 md:px-6 md:py-8">
+      <div className="mx-auto max-w-3xl px-6 py-7 md:px-10 md:py-9">
         <h1 className="text-lg font-bold text-foreground">집안일 편집</h1>
-        <div className="mt-6">
+        <div className="mt-8">
           {groupLoading || choresLoading ? (
             <p className="text-sm text-muted">불러오는 중…</p>
           ) : !activeGroup ? (

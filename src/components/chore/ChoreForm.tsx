@@ -112,7 +112,7 @@ export function ChoreForm({ group, initial }: ChoreFormProps) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-10">
       <Field label="이름">
         <input
           type="text"
