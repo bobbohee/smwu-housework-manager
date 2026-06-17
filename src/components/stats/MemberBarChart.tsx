@@ -6,13 +6,13 @@ export interface MemberBarChartProps {
 }
 
 const BAR_MAX_PX = 100;
-// 파랑 계열, 진한→연한. 높은 카운트가 진한 톤.
-const BLUE_SHADES = [
-  "#1d4ed8", // blue-700
-  "#2563eb", // blue-600
-  "#3b82f6", // blue-500
-  "#60a5fa", // blue-400
-  "#93c5fd", // blue-300
+// 오렌지 계열, 진한→연한. 높은 카운트가 진한 톤.
+const ORANGE_SHADES = [
+  "#f97316", // orange-500
+  "#fb923c", // orange-400
+  "#fdba74", // orange-300
+  "#fed7aa", // orange-200
+  "#ffedd5", // orange-100
 ] as const;
 
 export function MemberBarChart({ stats, memberNames }: MemberBarChartProps) {
@@ -43,9 +43,9 @@ export function MemberBarChart({ stats, memberNames }: MemberBarChartProps) {
           const heightPx = Math.round((s.count / max) * BAR_MAX_PX);
           const shadeIdx = Math.min(
             rankByUid.get(s.uid) ?? 0,
-            BLUE_SHADES.length - 1,
+            ORANGE_SHADES.length - 1,
           );
-          const color = BLUE_SHADES[shadeIdx];
+          const color = ORANGE_SHADES[shadeIdx];
           return (
             <div
               key={s.uid}
