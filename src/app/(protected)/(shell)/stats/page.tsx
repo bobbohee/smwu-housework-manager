@@ -33,8 +33,9 @@ export default function StatsPage() {
     () => aggregateByMember(logs, activeGroup?.memberUids ?? []),
     [logs, activeGroup?.memberUids],
   );
+  // 고정제는 완료 기록을 남기지 않으므로 통계 대상에서 제외 (순번제만 집계).
   const choreStats = useMemo(
-    () => aggregateByChore(logs, chores),
+    () => aggregateByChore(logs, chores.filter((c) => c.mode === "rotation")),
     [logs, chores],
   );
 
