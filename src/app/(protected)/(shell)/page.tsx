@@ -147,8 +147,8 @@ function FixedDutySection({
   if (items.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-chore-green/35 bg-chore-green/10 px-3 py-2.5">
-      <p className="text-sm font-bold uppercase tracking-wide text-chore-green">
+    <section className="rounded-lg border border-stone-300 bg-stone-100 px-3 py-2.5">
+      <p className="text-sm font-bold uppercase tracking-wide text-stone-600">
         오늘의 고정 집안일
       </p>
       <ul className="mt-1.5 space-y-1">
