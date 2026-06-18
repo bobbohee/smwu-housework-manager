@@ -62,3 +62,6 @@ ui-debug.log
 # logs
 logs/
 *.log
+
+# 기말 보고서 (커밋 제외)
+docs/report/
