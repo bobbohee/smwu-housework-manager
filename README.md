@@ -2,10 +2,6 @@
 
 > 셰어하우스·가족·기숙사 룸메이트를 위한 집안일 분담 · 순번 회전 · 통계 시각화 웹 애플리케이션
 
-**Live**: <https://smwu-housework-manager.vercel.app>
-**과목**: 숙명여자대학교 웹시스템설계 기말 프로젝트 (2026 봄학기)
-**작성자**: 박보희 / 2313731
-
 ---
 
 ## 한 줄 설명
@@ -15,9 +11,11 @@
 ## 스크린샷
 
 | 홈 (대시보드) | 캘린더 |
-|---|---|
+|:---:|:---:|
 | ![홈](docs/screenshots/home.png) | ![캘린더](docs/screenshots/calendar.png) |
-| **통계** | **꽝뽑기 결과** |
+
+| 통계 | 꽝뽑기 결과 |
+|:---:|:---:|
 | ![통계](docs/screenshots/stats.png) | ![꽝뽑기](docs/screenshots/random.png) |
 
 ## 주요 기능
