@@ -42,6 +42,7 @@ export default function SettingsPage() {
             <NameSection
               groupId={activeGroup.id}
               name={activeGroup.name}
+              isOwner={activeGroup.ownerId === user.uid}
               setError={setError}
               busy={busy}
               setBusy={setBusy}
@@ -112,12 +113,14 @@ function Card({
 function NameSection({
   groupId,
   name,
+  isOwner,
   setError,
   busy,
   setBusy,
 }: {
   groupId: string;
   name: string;
+  isOwner: boolean;
   setError: (s: string | null) => void;
   busy: boolean;
   setBusy: (b: boolean) => void;
@@ -174,15 +177,17 @@ function NameSection({
       ) : (
         <div className="flex items-center justify-between">
           <p className="text-base font-bold text-foreground">{name}</p>
-          <button
-            onClick={() => {
-              setDraft(name);
-              setEditing(true);
-            }}
-            className="rounded-md border border-border bg-surface px-3 py-1 text-xs font-medium text-foreground hover:bg-background"
-          >
-            수정
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => {
+                setDraft(name);
+                setEditing(true);
+              }}
+              className="rounded-md border border-border bg-surface px-3 py-1 text-xs font-medium text-foreground hover:bg-background"
+            >
+              수정
+            </button>
+          )}
         </div>
       )}
     </Card>
